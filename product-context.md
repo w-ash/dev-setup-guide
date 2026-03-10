@@ -1,0 +1,96 @@
+# Product Context
+
+> **Scope**: Define what you're building, who it's for, and what success looks like — before writing code
+> **Prerequisites**: None — do this first
+> **Deliverables**: Answers to 5 product questions, recorded in README.md and CLAUDE.md
+> **Estimated effort**: XS
+
+A coding agent that doesn't understand the product will make wrong trade-offs. Answer these questions before writing CLAUDE.md, before planning the backlog, before writing code.
+
+---
+
+## Five Questions
+
+### 1. What problem does this solve?
+
+The pain, not the features. What can't users do today, or what's painful about how they do it?
+
+- **Business**: "Small merchants can't accept payments without a $2,000 POS terminal and a 3-week setup process."
+- **Personal**: "My listening history is locked inside Spotify — I can't sort by Last.fm play count or create cross-service playlists."
+
+### 2. Who is it for?
+
+Specific persona — behaviors, goals, and context. "Everyone" means no one. "Me" is valid for personal projects, but be specific about what kind of "me."
+
+- **Business**: "Independent coffee shop owners who process 50-200 transactions/day and have no IT staff."
+- **Personal**: "Me — a music nerd who uses 3 streaming services, cares about listening stats, and wants playlists based on my actual habits, not an algorithm."
+
+### 3. Why build it? What's different?
+
+What exists today? Why isn't it good enough? What's your angle?
+
+- **Business**: "Square/Stripe exist but charge 2.9% + $0.30. We charge 1.5% flat. No hardware required — works on any phone."
+- **Personal**: "Spotify's 'Smart Playlists' don't exist. Apple Music's are limited. No tool lets me combine data across services and define my own rules."
+
+### 4. How will we know it's working?
+
+Success criteria — measurable or experiential. Without this, you can't prioritize.
+
+- **Business**: "100 merchants processing $10K/month within 6 months. Churn under 5%."
+- **Personal**: "I use the playlists it generates every week. Creating a new playlist takes under 30 seconds. I stop manually curating."
+
+### 5. What does it look like when it's done?
+
+Scope boundary. What's v1? What's explicitly out of scope? This prevents endless feature creep.
+
+- **Business**: "v1: payment processing + daily settlement reports. NOT inventory, NOT employee scheduling, NOT loyalty programs."
+- **Personal**: "v1: import Spotify likes + Last.fm history, build playlists from rules, push back to Spotify. NOT a music player, NOT social features."
+
+---
+
+## Where to Record This
+
+The same answers go in three places, each serving a different reader:
+
+**README.md** (humans — new contributors, future you):
+```markdown
+## The Problem
+[Answer to question 1]
+
+## The Solution
+[Answers to questions 3 + 5 — what you're building and how it's different]
+```
+
+**CLAUDE.md** (the AI agent — reads this every conversation):
+```markdown
+## What [Project] Does
+**[One-line pitch]**
+
+### User Problem
+- [Pain points from question 1]
+- [Who it's for from question 2]
+
+### Solution
+[How it works — concrete examples, not abstract descriptions]
+```
+
+**Backlog README** (planning — drives version priorities):
+```markdown
+## Key Technical Decisions
+[Informed by questions 3-5 — what you're building, what you're not, success criteria]
+```
+
+---
+
+## If You Don't Have Answers Yet
+
+If you're using this guide with a coding agent and haven't provided product context:
+
+**The agent should ask.** Before writing CLAUDE.md or creating a backlog, the agent should prompt you with these five questions. Quick, rough answers are fine — they can be refined later. No answers means the agent is guessing.
+
+Add this to your CLAUDE.md so the agent knows to ask:
+
+```markdown
+## Product Context
+If the answers below are missing or incomplete, ASK the user before proceeding with implementation.
+```
