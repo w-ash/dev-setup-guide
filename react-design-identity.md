@@ -99,18 +99,29 @@ These patterns appear in virtually every AI-generated interface. Each one has a 
 
 ---
 
-## Modern Trends Worth Considering (2025-2026)
+## Modern Trends Worth Considering (2026)
 
-Current design direction emphasizes **deliberate craft and tactile warmth**:
+Current design direction emphasizes **deliberate craft over decorative complexity**:
 
-- **Texture and grain** — noise overlays, layered textures that feel physical. Layered CSS backgrounds with subtle patterns add depth that flat surfaces lack.
+### Visual Language
+- **Texture and grain** — noise overlays, layered textures that feel physical. CSS backgrounds with subtle patterns add depth that flat surfaces lack.
 - **Technical mono / code brutalism** — monospaced type, terminal aesthetics, raw data presentation. Particularly strong for developer tools and data-heavy apps.
-- **Intentional motion** — animations that guide attention and confirm actions, not impress. Subtle microinteractions that make interfaces feel alive.
 - **Asymmetry and broken grids** — expressive layouts that break the 12-column grid with purpose. Not chaos — intentional variation.
-- **Organic warmth** — hand-drawn accents, organic shapes, character-rich serifs. Design that feels like someone cared about it.
 - **Monochromatic + meaningful accent** — one or two accent colors used sparingly and with purpose (the Linear approach). Powerful alternative to the "rainbow of Tailwind defaults."
 
-These are options, not requirements. Pick what fits your identity — the point is making deliberate choices, not following every trend.
+### Interaction Philosophy
+- **Self-evident over discoverable** — if users need a tutorial, the interface failed. Every element should communicate its purpose and state without documentation. This means text labels over icon-only buttons, status indicators that combine icon + color + text, and action labels that describe consequences ("Export to Drive" not "Submit").
+- **Progressive disclosure as information architecture** — not just "hide things behind accordions." Use visual weight (typography size, color intensity, spatial position) to create natural reading layers. Users scan the top layer and drill deeper only when needed.
+- **Preview-before-commit** — for any operation with side effects, show what will change *before* the user confirms. Real data previews ("12 tracks added, 3 removed") replace vague warnings ("This action cannot be undone").
+- **Intentional motion** — animations that guide attention and confirm actions, not impress. Entrance animations on route change, staggered list loads, smooth height transitions for collapsible content. 150ms for interactions, 300ms for layout shifts.
+- **Graceful state handling** — loading skeletons that match final layout shape (not spinners), empty states that explain + suggest + offer an action (not blank space), error states that show recovery paths (not "Something went wrong").
+
+### Emerging Patterns
+- **Spatial interfaces** — depth through layering (inset/flat/elevated surfaces), not just drop shadows. Background grain, subtle gradients, and surface hierarchy create dimensionality without skeuomorphism.
+- **Organic warmth** — hand-drawn accents, organic shapes, character-rich serifs. Design that feels like someone cared about it.
+- **AI-aware design** — as more interfaces are AI-generated, distinctiveness becomes a feature. Projects that invest in a specific visual identity stand out from the sea of indigo-gradient sameness. The bar for "looks professional" has risen because generic-professional is now free.
+
+These are options, not requirements. Pick what fits your identity — the point is making deliberate choices, not following every trend. For detailed interaction patterns (progressive disclosure, confirmation flows, status communication), see [Interaction Design Patterns](interaction-design-patterns.md).
 
 ---
 

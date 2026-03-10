@@ -356,7 +356,7 @@ This state machine should be the top-level decision in your App component.
 
 ## Step 6: UI Audit Checklist
 
-Run this checklist before marking any UI milestone as complete. Each item catches a specific class of oversight that compounds if left unchecked.
+Run this checklist before marking any UI milestone as complete. Each item catches a specific class of oversight that compounds if left unchecked. For interaction-specific checks (progressive disclosure, confirmation flows, status indicators, state handling), see the [Interaction Design Patterns](interaction-design-patterns.md) audit checklist.
 
 ### Identity & Polish
 - [ ] Custom page titles per route (not "Vite App")?
