@@ -14,11 +14,6 @@ Interface  →  Application  →  Domain  ←  Infrastructure
 (FastAPI)     (Use Cases)     (Logic)    (DB, APIs)
 ```
 
-- **Domain**: pure business logic, zero external imports, `Protocol` interfaces for repositories
-- **Application**: use case orchestration, owns transaction boundaries, constructor injection
-- **Infrastructure**: implements repository protocols, API clients, ORM models
-- **Interface**: thin route handlers (5-10 lines), delegates everything to use cases
-
 ---
 
 ## Use Case Runner Pattern
@@ -47,7 +42,7 @@ async def execute_use_case[TResult](
         return await use_case_factory(uow)
 ```
 
-Both CLI and API call the same runner — zero business logic duplication. See [CLI with Typer](cli-typer.md) for how the CLI uses this same pattern.
+Both CLI and API call the same runner — zero business logic duplication. See [CLI with Typer](cli-typer.md) for how the CLI uses this same pattern. For what goes inside the use case (transaction ownership, repository access, testing), see [Use Case Architecture](use-case-architecture.md).
 
 ---
 

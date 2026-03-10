@@ -171,7 +171,7 @@ result = await execute_use_case(
 )
 ```
 
-Both CLI and API call `execute_use_case()` — zero business logic duplication between interfaces.
+Both CLI and API call `execute_use_case()` — zero business logic duplication between interfaces. For how use cases consume UoW (transaction ownership, commit/rollback rules, read-only patterns), see [Use Case Architecture](use-case-architecture.md).
 
 ---
 

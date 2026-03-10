@@ -117,17 +117,7 @@ class CreateOrderResult:
 - Even parameterless queries get a Command for API uniformity: `class GetStatsCommand: pass`
 - Adding optional fields to Command/Result never breaks existing callers
 
-```python
-@define(slots=True)
-class CreateOrderUseCase:
-    """Use case — always `async def execute(command, uow) -> Result`."""
-
-    async def execute(
-        self, command: CreateOrderCommand, uow: UnitOfWork
-    ) -> CreateOrderResult:
-        # All use cases follow this exact signature pattern
-        ...
-```
+For the full use case execution pattern (transaction boundaries, UoW, testing), see [Use Case Architecture](use-case-architecture.md).
 
 ---
 

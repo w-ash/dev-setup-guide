@@ -40,21 +40,23 @@ Set up the backlog before building anything. Use it to plan all remaining guide 
 
 ### Phase 5: Stack (pick what applies)
 
-#### Backend API
+#### Backend API *(skip if no backend API)*
 - [ ] **[FastAPI Backend](fastapi-backend.md)** — Clean Architecture, use case runner, routes, error envelope, OpenAPI `[M]`
 - [ ] **[Domain Modeling](domain-modeling.md)** — Immutable entities, Command/Result pattern, structured failures `[M]`
 - [ ] **[Use Case Architecture](use-case-architecture.md)** — Transaction ownership, repository access, connector protocols, audit checklist `[M]`
 - [ ] **[Database Patterns](database-patterns.md)** — Batch-first repos, Unit of Work, eager loading *(skip if no DB)* `[M]`
 - [ ] **[External API Resilience](external-api-resilience.md)** — Error classification, retry policies, SSE progress `[M]`
 
-#### Frontend
+> **Note**: Build the API before the frontend — Orval codegen needs the OpenAPI spec.
+
+#### Frontend *(skip if no frontend)*
 - [ ] **[React Tooling](react-tooling.md)** — Vite, TypeScript strict mode, Biome `[S]`
 - [ ] **[Design Identity](react-design-identity.md)** — Visual identity, anti-AI-slop principles, design system rules `[M]`
 - [ ] **[Frontend Architecture](react-frontend-architecture.md)** — IA, app shell, navigation, theme implementation, user state, UI audit `[M]`
 - [ ] **[Interaction Design](interaction-design-patterns.md)** — Progressive disclosure, self-evident UI, confirmation flows, state handling `[M]`
 - [ ] **[React API & Testing](react-api-testing.md)** — Orval codegen, custom fetch, QueryClient, Vitest + MSW `[M]`
 
-#### CLI
+#### CLI *(skip if no CLI)*
 - [ ] **[CLI with Typer](cli-typer.md)** — App structure, async bridge, command modules, error handling `[M]`
 - [ ] **[CLI Rich Patterns](cli-rich-patterns.md)** — Interactive menus, progress displays, styled output `[S]`
 
@@ -86,8 +88,4 @@ pnpm --prefix web check && pnpm --prefix web build  # Frontend quality gates
 # -- Frontend -----------------------------------------------
 pnpm --prefix web dev                       # Vite dev server
 pnpm --prefix web generate                  # Orval codegen from openapi.json
-
-# -- CLI ----------------------------------------------------
-poetry run my-app --help                    # Show CLI help
-poetry run my-app command --verbose         # Run with debug logging
 ```

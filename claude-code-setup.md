@@ -36,7 +36,7 @@ Fill in the product sections from your [Product Context](product-context.md) wor
 
 ## Core Principles (YOU MUST FOLLOW)
 - **Python 3.14+ Required** - Modern syntax, type safety
-- **Ruthlessly DRY** - No code duplication
+- **DRY Where It Counts** - No duplicated business logic; structural patterns may repeat for readability
 - **Immutable Domain** - Pure transformations, no side effects
 - **Batch-First** - Collections over single items
 - [Your project-specific principles]

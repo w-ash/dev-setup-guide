@@ -94,8 +94,6 @@ class StripeErrorClassifier(HTTPErrorClassifier):
         return None  # Fall through to HTTP base
 ```
 
-**Why a classifier hierarchy**: The base handles 90% of HTTP error logic. Each service overrides only its quirks. Adding a new API integration means writing 5-10 lines of service-specific classification, not reimplementing error handling from scratch.
-
 ---
 
 ## Retry Policies Driven by Classification
@@ -253,8 +251,6 @@ def make_weather_client() -> httpx.AsyncClient:
         event_hooks=_EVENT_HOOKS,
     )
 ```
-
-**Why shared event hooks**: Every HTTP call in your application produces structured log entries — method, URL, status, latency, error body — without any per-call logging code. When debugging "why is this API slow?", the logs already have the answer.
 
 ---
 

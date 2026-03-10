@@ -17,8 +17,6 @@ The goal: users should understand what they're looking at and what they can do w
 2. **What state is it in?** — status indicators, visual feedback
 3. **What can I do?** — discoverable actions, obvious affordances
 
-If users need a tutorial to use your app, the interface failed. If they need to hover over things to find out what they are, the interface failed. Design for scanning, not reading.
-
 ### Principles
 
 **Labels over icons alone.** Icons are ambiguous — a gear could mean settings, configuration, or preferences. Pair icons with text labels. The only exception: universally understood icons (close X, back arrow, search magnifier) in contexts where space is genuinely constrained.

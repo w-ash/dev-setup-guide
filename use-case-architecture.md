@@ -5,7 +5,7 @@
 > **Deliverables**: Use cases following the Command/Result/Execute contract, passing the audit checklist
 > **Estimated effort**: M
 
-How to structure use cases so they're testable, composable, and auditable. The runner and route handler patterns are in [FastAPI Backend](fastapi-backend.md) — this guide covers what happens *inside* the use case.
+How to structure use cases so they're testable, composable, and auditable. The runner and route handler patterns are in [FastAPI Backend](fastapi-backend.md) — this guide covers what happens *inside* the use case. For Command/Result data modeling patterns (attrs, validators, sentinel for partial updates), see [Domain Modeling](domain-modeling.md).
 
 ---
 
@@ -73,13 +73,7 @@ class ListOrdersCommand:
     """Parameterless — exists so the signature never changes when params are added."""
 ```
 
-### Why `frozen=True` for Command and Result
-
-They cross layer boundaries. The API route creates a Command, passes it to the use case, and reads a Result. If anything could mutate these mid-flight, you have shared mutable state across layers. `frozen=True` eliminates that class of bug.
-
-### Why `slots=True` everywhere
-
-Beyond memory efficiency: it **prevents dynamic attribute assignment**. Typos like `command.cusotmer_id` fail loudly instead of silently creating a new attribute.
+`frozen=True` on Command/Result prevents shared mutable state across layer boundaries. `slots=True` everywhere prevents silent typos like `command.cusotmer_id` from creating dynamic attributes.
 
 ---
 
@@ -102,6 +96,8 @@ Rules:
 - **`await uow.commit()` is explicit** — only on the success path
 - **Read-only use cases skip `commit()`** — still use `async with uow:` for session scoping
 - **Exceptions auto-rollback** — the context manager handles cleanup
+
+For UoW implementation details (auto-commit, session lifecycle, `execute_use_case()` bridge), see [Database Patterns](database-patterns.md).
 
 ### Read-Only Pattern (Previews, Lists, Gets)
 
@@ -155,11 +151,6 @@ class SyncToStorageUseCase:
         connector: StorageConnector = resolve_storage_connector(command.service, uow)
         folder = await connector.get_folder(command.external_id)
 ```
-
-Benefits:
-- Use case is testable by mocking the protocol
-- Documents exactly which capabilities the use case needs
-- No infrastructure imports in the application layer
 
 ---
 
