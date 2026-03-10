@@ -43,12 +43,15 @@ Set up the backlog before building anything. Use it to plan all remaining guide 
 #### Backend API
 - [ ] **[FastAPI Backend](fastapi-backend.md)** — Clean Architecture, use case runner, routes, error envelope, OpenAPI `[M]`
 - [ ] **[Domain Modeling](domain-modeling.md)** — Immutable entities, Command/Result pattern, structured failures `[M]`
+- [ ] **[Use Case Architecture](use-case-architecture.md)** — Transaction ownership, repository access, connector protocols, audit checklist `[M]`
 - [ ] **[Database Patterns](database-patterns.md)** — Batch-first repos, Unit of Work, eager loading *(skip if no DB)* `[M]`
 - [ ] **[External API Resilience](external-api-resilience.md)** — Error classification, retry policies, SSE progress `[M]`
 
 #### Frontend
 - [ ] **[React Tooling](react-tooling.md)** — Vite, TypeScript strict mode, Biome `[S]`
 - [ ] **[Design Identity](react-design-identity.md)** — Visual identity, anti-AI-slop principles, design system rules `[M]`
+- [ ] **[Frontend Architecture](react-frontend-architecture.md)** — IA, app shell, navigation, theme implementation, user state, UI audit `[M]`
+- [ ] **[Interaction Design](interaction-design-patterns.md)** — Progressive disclosure, self-evident UI, confirmation flows, state handling `[M]`
 - [ ] **[React API & Testing](react-api-testing.md)** — Orval codegen, custom fetch, QueryClient, Vitest + MSW `[M]`
 
 #### CLI
@@ -81,7 +84,7 @@ poetry run basedpyright src/                # Type check
 pnpm --prefix web check && pnpm --prefix web build  # Frontend quality gates
 
 # -- Frontend -----------------------------------------------
-pnpm --prefix web dev                       # Vite dev server (port 5173)
+pnpm --prefix web dev                       # Vite dev server
 pnpm --prefix web generate                  # Orval codegen from openapi.json
 
 # -- CLI ----------------------------------------------------

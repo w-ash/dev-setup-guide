@@ -15,6 +15,7 @@ Not all errors are equal. Classify them so retry logic can make intelligent deci
 # src/infrastructure/connectors/_shared/error_classifier.py
 from typing import Protocol
 
+
 class ErrorClassifier(Protocol):
     def classify(self, exception: Exception) -> tuple[str, str, str]:
         """Classify an error for retry behavior.
@@ -33,6 +34,7 @@ Most external APIs communicate via HTTP. The base classifier maps status codes t
 ```python
 from abc import ABC, abstractmethod
 import httpx
+
 
 class HTTPErrorClassifier(ABC):
     """Shared HTTP error classification — override for service-specific rules."""
@@ -64,7 +66,8 @@ class HTTPErrorClassifier(ABC):
 
     @abstractmethod
     def _classify_service_error(
-        self, exception: Exception,
+        self,
+        exception: Exception,
     ) -> tuple[str, str, str] | None:
         """Service-specific classification hook. Return None to fall through."""
         ...
@@ -79,11 +82,14 @@ class StripeErrorClassifier(HTTPErrorClassifier):
     """Stripe treats 401 as temporary (token refresh already triggered)."""
 
     def _classify_service_error(
-        self, exception: Exception,
+        self,
+        exception: Exception,
     ) -> tuple[str, str, str] | None:
-        if (isinstance(exception, httpx.HTTPStatusError)
+        if (
+            isinstance(exception, httpx.HTTPStatusError)
             and exception.response.status_code == 401
-            and "expired" in exception.response.text.lower()):
+            and "expired" in exception.response.text.lower()
+        ):
             return ("temporary", "401", "Token expired — refreshing")
         return None  # Fall through to HTTP base
 ```
@@ -99,17 +105,23 @@ The classifier feeds into Tenacity retry policies. Permanent errors fail fast; t
 ```python
 # src/infrastructure/connectors/_shared/retry_policies.py
 from tenacity import (
-    AsyncRetrying, retry_if_exception, stop_after_attempt,
-    wait_exponential, RetryCallState,
+    AsyncRetrying,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+    RetryCallState,
 )
+
 
 def create_classifier_retry(classifier: ErrorClassifier):
     """Build a retry predicate from an error classifier."""
+
     def should_retry(exc: BaseException) -> bool:
         if not isinstance(exc, Exception):
             return False  # Never retry KeyboardInterrupt, SystemExit
         error_type, _, _ = classifier.classify(exc)
         return error_type not in ("permanent", "not_found")
+
     return retry_if_exception(should_retry)
 ```
 
@@ -118,15 +130,18 @@ def create_classifier_retry(classifier: ErrorClassifier):
 ```python
 from attrs import define
 
+
 @define(frozen=True)
 class RetryConfig:
     """All retry tuning in one place — no magic numbers in business logic."""
+
     service_name: str
     classifier: ErrorClassifier
     max_attempts: int = 3
     backoff_multiplier: float = 1.0
     backoff_max: float = 30.0
     max_total_delay: float | None = None
+
 
 class RetryPolicyFactory:
     @staticmethod
@@ -142,19 +157,27 @@ class RetryPolicyFactory:
             reraise=True,
         )
 
+
 def _log_retry(config: RetryConfig):
     """Log each retry attempt with classified error context."""
+
     def handler(retry_state: RetryCallState) -> None:
         exc = retry_state.outcome.exception() if retry_state.outcome else None
         if not isinstance(exc, Exception):
             return
         error_type, code, desc = config.classifier.classify(exc)
         if error_type == "rate_limit":
-            logger.warning(f"{config.service_name} rate limited — pausing",
-                           wait=retry_state.idle_for)
+            logger.warning(
+                f"{config.service_name} rate limited — pausing",
+                wait=retry_state.idle_for,
+            )
         else:
-            logger.warning(f"{config.service_name} retry {retry_state.attempt_number}",
-                           error_type=error_type, code=code)
+            logger.warning(
+                f"{config.service_name} retry {retry_state.attempt_number}",
+                error_type=error_type,
+                code=code,
+            )
+
     return handler
 ```
 
@@ -183,20 +206,27 @@ from loguru import logger
 
 _http_logger = logger.bind(module="http_client")
 
+
 async def _log_request(request: httpx.Request) -> None:
     _http_logger.debug("HTTP request", method=request.method, url=str(request.url))
+
 
 async def _log_response(response: httpx.Response) -> None:
     await response.aread()  # Buffer body + populate elapsed time
     if response.status_code < 400:
-        _http_logger.debug("HTTP response",
-                           status=response.status_code,
-                           elapsed_ms=response.elapsed.total_seconds() * 1000)
+        _http_logger.debug(
+            "HTTP response",
+            status=response.status_code,
+            elapsed_ms=response.elapsed.total_seconds() * 1000,
+        )
     else:
-        _http_logger.warning("HTTP error",
-                             status=response.status_code,
-                             body=response.text[:500],
-                             retry_after=response.headers.get("Retry-After"))
+        _http_logger.warning(
+            "HTTP error",
+            status=response.status_code,
+            body=response.text[:500],
+            retry_after=response.headers.get("Retry-After"),
+        )
+
 
 _EVENT_HOOKS: dict[str, list] = {
     "request": [_log_request],
@@ -214,6 +244,7 @@ def make_stripe_client(api_key: str) -> httpx.AsyncClient:
         timeout=httpx.Timeout(connect=5.0, read=30.0, write=10.0, pool=5.0),
         event_hooks=_EVENT_HOOKS,  # Shared hooks — all traffic logged
     )
+
 
 def make_weather_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
@@ -238,6 +269,7 @@ For long-running operations triggered via API, return an **operation ID immediat
 from uuid import uuid4
 import asyncio
 
+
 class OperationRegistry:
     """Maps operation_id → asyncio.Queue for event routing."""
 
@@ -252,7 +284,9 @@ class OperationRegistry:
     async def get_queue(self, operation_id: str) -> asyncio.Queue | None:
         return self._queues.get(operation_id)
 
+
 SSE_SENTINEL = object()  # Signals the SSE generator to close
+
 
 async def prepare_operation() -> tuple[str, asyncio.Queue]:
     """Generate ID + register queue BEFORE starting work."""

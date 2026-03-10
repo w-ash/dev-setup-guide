@@ -14,11 +14,12 @@ A reusable menu component eliminates Panel → Prompt → dispatch boilerplate:
 ```python
 from attrs import define
 
+
 @define(frozen=True, slots=True)
 class MenuOption:
-    key: str               # "1", "2", etc.
-    aliases: list[str]     # ["lastfm", "last.fm"]
-    label: str             # Rich markup: "[bold]Last.fm[/bold] — Import history"
+    key: str  # "1", "2", etc.
+    aliases: list[str]  # ["lastfm", "last.fm"]
+    label: str  # Rich markup: "[bold]Last.fm[/bold] — Import history"
     handler: Callable[[], None]
 
 
@@ -34,7 +35,10 @@ def run_interactive_menu(
     for opt in options:
         console.print(f"  [{opt.key}] {opt.label}")
 
-    choice = Prompt.ask("Select", choices=[o.key for o in options] + [a for o in options for a in o.aliases])
+    choice = Prompt.ask(
+        "Select",
+        choices=[o.key for o in options] + [a for o in options for a in o.aliases],
+    )
     selected = next(o for o in options if choice == o.key or choice in o.aliases)
     selected.handler()
 ```
@@ -73,6 +77,7 @@ from rich.console import Console
 
 _console: Console | None = None
 
+
 def get_console() -> Console:
     global _console
     if _console is None:
@@ -84,6 +89,7 @@ For error output, use a separate stderr console:
 
 ```python
 _err_console: Console | None = None
+
 
 def get_err_console() -> Console:
     global _err_console
@@ -100,6 +106,7 @@ def get_err_console() -> Console:
 
 ```python
 from rich.table import Table
+
 
 def display_result(result: OperationResult) -> None:
     console = get_console()
@@ -119,10 +126,12 @@ def display_result(result: OperationResult) -> None:
 ```python
 from rich.panel import Panel
 
-console.print(Panel.fit(
-    f"[bold green]Success[/bold green] — Processed {count} items",
-    border_style="green",
-))
+console.print(
+    Panel.fit(
+        f"[bold green]Success[/bold green] — Processed {count} items",
+        border_style="green",
+    )
+)
 ```
 
 ### Dim Styling for Secondary Data
@@ -181,13 +190,18 @@ Common patterns that appear across command modules:
 ```python
 from datetime import UTC, datetime
 
-def parse_date_string(date_str: str | None, field_name: str = "date") -> datetime | None:
+
+def parse_date_string(
+    date_str: str | None, field_name: str = "date"
+) -> datetime | None:
     if not date_str:
         return None
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=UTC)
     except ValueError:
-        get_err_console().print(f"[red]Invalid {field_name} format: {date_str}. Use YYYY-MM-DD.[/red]")
+        get_err_console().print(
+            f"[red]Invalid {field_name} format: {date_str}. Use YYYY-MM-DD.[/red]"
+        )
         raise typer.Exit(1) from None
 ```
 

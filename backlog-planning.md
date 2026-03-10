@@ -285,6 +285,8 @@ From the [Getting Started guide](../../docs/dev-setup-guide/README.md).
     - What: Vite, TypeScript strict mode, Biome
 - [ ] **Design Identity** — Effort: M — [guide](../../docs/dev-setup-guide/react-design-identity.md)
     - What: Visual identity, anti-AI-slop principles, design system rules
+- [ ] **Frontend Architecture** — Effort: M — [guide](../../docs/dev-setup-guide/react-frontend-architecture.md)
+    - What: IA, page inventory, app shell, navigation, theme implementation, user state, user flows, UI audit checklist
 - [ ] **React API & Testing** — Effort: M — [guide](../../docs/dev-setup-guide/react-api-testing.md)
     - What: Orval codegen, custom fetch, QueryClient, Vitest + MSW
 

@@ -50,6 +50,7 @@ def make_item(*, id: int = 1, name: str = "Test Item", **overrides) -> Item:
     """Factory with keyword overrides for any field."""
     return Item(id=id, name=name, **overrides)
 
+
 def make_items(count: int = 5) -> list[Item]:
     """Batch factory producing numbered items."""
     return [make_item(id=i, name=f"Item {i}") for i in range(1, count + 1)]
@@ -84,6 +85,7 @@ def make_mock_repo(**overrides) -> AsyncMock:
     for k, v in overrides.items():
         setattr(repo, k, v)
     return repo
+
 
 def make_mock_uow(**repo_overrides) -> MagicMock:
     """Pre-wired UoW — all repos have defaults, override only what matters."""
@@ -120,6 +122,7 @@ uow.get_item_repository.return_value.find_by_ids.return_value = {1: item}
 # tests/conftest.py
 import pytest
 
+
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     """Auto-apply unit/integration markers based on test file location."""
     for item in items:
@@ -144,9 +147,11 @@ import os
 import tempfile
 from uuid import uuid4
 
+
 def pytest_configure(config: pytest.Config) -> None:
     """Safety guard: prevent tests from accidentally using production database."""
     os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///tmp/pytest_guard_DO_NOT_USE.db"
+
 
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession]:
@@ -155,8 +160,7 @@ async def db_session() -> AsyncGenerator[AsyncSession]:
     original_url = os.environ.get("DATABASE_URL")
     os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{db_file}"
 
-    reset_engine_cache()  # Clear the cached engine so a fresh one is created with the new URL
-    # Implementation: set the module-level _engine variable to None in your database module
+    reset_engine_cache()  # Clear cached engine so a fresh one uses the new URL
     await init_db()       # Run migrations to create schema
 
     session = get_session_factory()()

@@ -89,7 +89,7 @@ cp .env.example .env
 poetry run alembic upgrade head
 
 # Start the API server
-poetry run uvicorn src.interface.api.app:app --reload --port 8000
+poetry run uvicorn src.interface.api.app:app --reload --port 8000  # Pick a unique port per project
 
 # Start the frontend (separate terminal)
 pnpm --prefix web install

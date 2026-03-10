@@ -24,7 +24,7 @@ export default defineConfig({
     open: true,
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: "http://localhost:8000",  // Match your API port
         changeOrigin: true,
       },
     },
@@ -35,7 +35,7 @@ export default defineConfig({
 });
 ```
 
-Key features: Tailwind v4 plugin, `@/` import alias, and `/api` proxy to FastAPI during development.
+Key features: Tailwind v4 plugin, `@/` import alias, and `/api` proxy to FastAPI during development. Choose unique ports per project so multiple projects can run simultaneously — update both the Vite proxy target and the FastAPI CORS origin to match.
 
 ### Tailwind v4 Setup
 

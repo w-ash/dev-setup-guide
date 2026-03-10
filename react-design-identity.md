@@ -11,7 +11,7 @@
 
 Every major LLM trains on the same Bootstrap layouts, Tailwind templates, and UI kit screenshots. Without specific guidance, they converge on the **statistical average of "website"** — indigo gradients, uniform card grids, identical spacing, glassmorphism everywhere. The result: every AI-assisted project looks identical.
 
-The fix isn't avoiding AI tools — it's giving them a strong, specific identity to enforce.
+The fix: give AI tools a strong, specific identity to enforce. Ground every design decision in your users' needs and your app's personality. Users should feel like someone thoughtful built this for them — not like they're using a template.
 
 ---
 
@@ -74,9 +74,7 @@ Font choice should match the character of your system:
 
 ## Step 3: Avoid Universal Anti-Patterns
 
-Universal anti-patterns:
-
-**Visual cliches:**
+**Visual clichés:**
 - **Default typeface (Inter)** — see Font Selection above
 - Purple/blue/indigo gradient as primary palette (the Tailwind default that every LLM reaches for)
 - Glassmorphism/frosted glass as the entire design foundation (fine as a surgical accent on one element)
@@ -91,24 +89,35 @@ Universal anti-patterns:
 - **Frankenstein layouts** — sections that feel randomly assembled (hero, then cards, then testimonials, then CTA) without narrative flow
 - **Over-generation** — more UI elements than necessary. Every unnecessary gridline, heavy border, or decorative effect is cognitive load.
 - **No design system ownership** — screens look smooth in isolation but spacing scales, type tokens, and composition rules are inconsistent across pages
-- **Placeholder content in production** — "Lorem ipsum" and "Song Title x5" never got replaced with real data
+- **Placeholder content in production** — "Lorem ipsum" and "Item 1" never got replaced with real data
 
 **The real-content test**: always design with actual data — long names, empty lists, single items, overflow text. AI-generated UIs fall apart with real content.
 
 ---
 
-## Modern Trends Worth Considering (2025-2026)
+## Modern Trends Worth Considering (2026)
 
-The dominant design response to AI saturation is **deliberate imperfection and tactile warmth**:
+Current design direction emphasizes **deliberate craft over decorative complexity**:
 
-- **Texture and grain** — noise overlays, layered textures that feel physical, not sterile. Breaks the "flat digital" monotony that AI defaults to.
+### Visual Language
+- **Texture and grain** — noise overlays, layered textures that feel physical. CSS backgrounds with subtle patterns add depth that flat surfaces lack.
 - **Technical mono / code brutalism** — monospaced type, terminal aesthetics, raw data presentation. Particularly strong for developer tools and data-heavy apps.
-- **Intentional motion** — animations that guide attention and confirm actions, not impress. Subtle microinteractions that make interfaces feel alive.
 - **Asymmetry and broken grids** — expressive layouts that break the 12-column grid with purpose. Not chaos — intentional variation.
-- **Anti-corporate warmth** — hand-drawn accents, organic shapes, wonky serifs. Signals "a human made choices here."
 - **Monochromatic + meaningful accent** — one or two accent colors used sparingly and with purpose (the Linear approach). Powerful alternative to the "rainbow of Tailwind defaults."
 
-These are options, not requirements. Pick what fits your identity — the point is making deliberate choices, not following every trend.
+### Interaction Philosophy
+- **Self-evident over discoverable** — if users need a tutorial, the interface failed. Every element should communicate its purpose and state without documentation. This means text labels over icon-only buttons, status indicators that combine icon + color + text, and action labels that describe consequences ("Export to Drive" not "Submit").
+- **Progressive disclosure as information architecture** — not just "hide things behind accordions." Use visual weight (typography size, color intensity, spatial position) to create natural reading layers. Users scan the top layer and drill deeper only when needed.
+- **Preview-before-commit** — for any operation with side effects, show what will change *before* the user confirms. Real data previews ("12 items added, 3 removed") replace vague warnings ("This action cannot be undone").
+- **Intentional motion** — animations that guide attention and confirm actions, not impress. Entrance animations on route change, staggered list loads, smooth height transitions for collapsible content. 150ms for interactions, 300ms for layout shifts.
+- **Graceful state handling** — loading skeletons that match final layout shape (not spinners), empty states that explain + suggest + offer an action (not blank space), error states that show recovery paths (not "Something went wrong").
+
+### Emerging Patterns
+- **Spatial interfaces** — depth through layering (inset/flat/elevated surfaces), not just drop shadows. Background grain, subtle gradients, and surface hierarchy create dimensionality without skeuomorphism.
+- **Organic warmth** — hand-drawn accents, organic shapes, character-rich serifs. Design that feels like someone cared about it.
+- **AI-aware design** — as more interfaces are AI-generated, distinctiveness becomes a feature. Projects that invest in a specific visual identity stand out from the sea of indigo-gradient sameness. The bar for "looks professional" has risen because generic-professional is now free.
+
+These are options, not requirements. Pick what fits your identity — the point is making deliberate choices, not following every trend. For detailed interaction patterns (progressive disclosure, confirmation flows, status communication), see [Interaction Design Patterns](interaction-design-patterns.md).
 
 ---
 
@@ -122,7 +131,7 @@ Your visual identity should live in a `.claude/rules/web-design-system.md` file 
 3. Your specific anti-patterns (what to avoid in YOUR context)
 4. Your signature elements (what makes your app visually recognizable)
 
-**Example** — Narada (music metadata tool, dark editorial aesthetic):
+**Example** — a music metadata tool with a dark editorial aesthetic:
 
 ```markdown
 ---
@@ -130,15 +139,14 @@ paths:
   - "web/src/components/**"
   - "web/src/pages/**"
 ---
-# Web Design System — Dark Editorial Music Aesthetic
+# Web Design System — Dark Editorial Aesthetic
 
-Narada is a power tool for music metadata enthusiasts — the "record store
-crate-digger," not the casual listener. Precise, data-rich, intentionally crafted.
+A power tool for metadata enthusiasts. Precise, data-rich, intentionally crafted.
 
 ## Typography Hierarchy (enforce)
 - Display font (Space Grotesk): headings, buttons, nav labels
 - Body font (Newsreader): descriptions, prose, metadata values
-- Mono font (JetBrains Mono): ISRCs, IDs, durations, timestamps
+- Mono font (JetBrains Mono): IDs, durations, timestamps, codes
 
 ## Visual Identity
 - 3-level depth system (inset/flat/elevated) — no uniform containers

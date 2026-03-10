@@ -21,7 +21,7 @@ from typing import Annotated
 app = typer.Typer(
     help="My Project CLI",
     no_args_is_help=True,
-    rich_markup_mode="rich",       # Enable [bold], [cyan], etc. in help text
+    rich_markup_mode="rich",  # Enable [bold], [cyan], etc. in help text
     add_completion=False,
     pretty_exceptions_enable=True,
 )
@@ -62,6 +62,7 @@ def _register_commands() -> None:
         rich_help_panel="Data Management",
     )
 
+
 _register_commands()
 ```
 
@@ -81,6 +82,7 @@ from typing import Any
 
 def run_async[T](coro: Coroutine[Any, Any, T]) -> T:
     """Bridge sync CLI → async application layer."""
+
     async def _run_with_executor() -> T:
         loop = asyncio.get_running_loop()
         loop.set_default_executor(ThreadPoolExecutor(max_workers=8))
@@ -93,9 +95,7 @@ def run_async[T](coro: Coroutine[Any, Any, T]) -> T:
 ```python
 @app.command()
 def sync_data() -> None:
-    result = run_async(execute_use_case(
-        lambda uow: SyncDataUseCase(uow).execute()
-    ))
+    result = run_async(execute_use_case(lambda uow: SyncDataUseCase(uow).execute()))
     display_result(result)
 ```
 
@@ -113,7 +113,7 @@ import typer
 
 app = typer.Typer(
     help="Execute and manage workflows",
-    no_args_is_help=False,        # Allow bare invocation for interactive mode
+    no_args_is_help=False,  # Allow bare invocation for interactive mode
     rich_markup_mode="rich",
 )
 ```
@@ -127,6 +127,7 @@ Use `invoke_without_command=True` to show an interactive browser when called wit
 def workflow_main(ctx: typer.Context) -> None:
     if ctx.invoked_subcommand is None:
         _show_interactive_browser()
+
 
 @app.command()
 def run(workflow_id: str | None = None) -> None:
@@ -145,6 +146,7 @@ This supports both interactive users (`my-app workflow` → browser) and automat
 ```python
 import typer
 from typing import Never
+
 
 def handle_cli_error(e: Exception, message: str) -> Never:
     err_console = get_err_console()

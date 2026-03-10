@@ -31,21 +31,24 @@ class DatabaseConfig(BaseModel):
     url: str = "sqlite+aiosqlite:///data/app.db"
     echo: bool = False
 
+
 class LoggingConfig(BaseModel):
     console_level: str = "INFO"
     file_level: str = "DEBUG"
     json_output: bool = True
+
 
 class APIConfig(BaseModel):
     batch_size: PositiveInt = 50
     rate_limit: PositiveFloat | None = None
     request_timeout: PositiveInt = 30
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_nested_delimiter="__",   # DATABASE__URL → database.url
+        env_nested_delimiter="__",  # DATABASE__URL → database.url
         case_sensitive=False,
-        env_ignore_empty=True,       # FOO= uses default, not empty string
+        env_ignore_empty=True,  # FOO= uses default, not empty string
     )
 
     database: DatabaseConfig = DatabaseConfig()
@@ -60,6 +63,7 @@ Support both nested (`DATABASE__URL`) and flat (`DATABASE_URL`) environment vari
 ```python
 from pydantic import model_validator
 
+
 class Settings(BaseSettings):
     # Map flat env vars to nested structure
     _FLAT_ROUTES: ClassVar[dict[str, tuple[str, str]]] = {
@@ -72,6 +76,7 @@ class Settings(BaseSettings):
     def route_flat_env_vars(cls, data: dict) -> dict:
         """Route DATABASE_URL → database.url for backward compat."""
         import os
+
         for env_var, (group, field) in cls._FLAT_ROUTES.items():
             if value := os.environ.get(env_var):
                 data.setdefault(group, {})[field] = value
@@ -92,28 +97,36 @@ Group constants by *concern*, not by type. Use classes as namespaces with `Final
 # src/config/constants.py
 from typing import Final
 
+
 class HTTPStatus:
     """HTTP status range boundaries for error classification."""
+
     CLIENT_ERROR_MIN: Final = 400
     CLIENT_ERROR_MAX: Final = 500
     SERVER_ERROR_MIN: Final = 500
     SERVER_ERROR_MAX: Final = 600
 
+
 class BusinessLimits:
     """Business logic limits — not user-configurable."""
+
     DEFAULT_PAGE_SIZE: Final = 50
     MAX_PAGE_SIZE: Final = 200
     MAX_BATCH_SIZE: Final = 1000
     MAX_RETRY_ATTEMPTS: Final = 3
 
+
 class ExternalAPI:
     """External API format specifications and validation constants."""
+
     MAX_SEARCH_RESULTS: Final = 10
     IDENTIFIER_LENGTH: Final = 22
     URI_PARTS: Final = 3
 
+
 class Defaults:
     """Default values used across the application."""
+
     DEFAULT_USER_ID: Final = "default"
     DEFAULT_TIMEZONE: Final = "UTC"
 ```
@@ -137,6 +150,7 @@ Configure logging once at startup. Separate **console** (human-readable, coloriz
 import sys
 from loguru import logger
 from pathlib import Path
+
 
 def setup_logging(*, verbose: bool = False, log_dir: str = "logs") -> None:
     """Configure logging with console + JSON file output."""
@@ -163,12 +177,12 @@ def setup_logging(*, verbose: bool = False, log_dir: str = "logs") -> None:
             {
                 "sink": str(log_path / "app.log"),
                 "level": "DEBUG",
-                "serialize": True,       # JSON output for log aggregation
-                "rotation": "10 MB",     # Size-based rotation
-                "retention": "1 week",   # Auto-delete old logs
-                "compression": "zip",    # Compress rotated files
-                "enqueue": True,         # Async writes (don't block app)
-                "catch": True,           # Don't crash app on logging errors
+                "serialize": True,  # JSON output for log aggregation
+                "rotation": "10 MB",  # Size-based rotation
+                "retention": "1 week",  # Auto-delete old logs
+                "compression": "zip",  # Compress rotated files
+                "enqueue": True,  # Async writes (don't block app)
+                "catch": True,  # Don't crash app on logging errors
             },
         ],
         # Default context fields — appear in every log entry
@@ -183,6 +197,7 @@ def setup_logging(*, verbose: bool = False, log_dir: str = "logs") -> None:
 from loguru import logger
 
 log = logger.bind(module=__name__)
+
 
 async def process_item(item_id: int) -> None:
     log.info("Processing item", item_id=item_id)
@@ -214,14 +229,14 @@ async def import_data(source: str, user_id: str) -> None:
 # Production handler — no backtrace or diagnose (prevents info leakage)
 {
     "sink": str(log_path / "app.log"),
-    "backtrace": False,     # Don't show local variables in tracebacks
-    "diagnose": False,      # Don't show variable values in exception frames
+    "backtrace": False,  # Don't show local variables in tracebacks
+    "diagnose": False,  # Don't show variable values in exception frames
 }
 
 # Development handler — full diagnostics
 {
     "sink": sys.stdout,
-    "backtrace": True,      # Show local variables
-    "diagnose": True,       # Show variable values (sensitive data risk!)
+    "backtrace": True,  # Show local variables
+    "diagnose": True,  # Show variable values (sensitive data risk!)
 }
 ```

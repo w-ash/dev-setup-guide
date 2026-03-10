@@ -17,6 +17,7 @@ Define repository contracts in the **domain layer** using `Protocol`. The key pr
 # src/domain/repositories/interfaces.py
 from typing import Protocol, Awaitable
 
+
 class ItemRepositoryProtocol(Protocol):
     """Batch-first repository contract — collections over single items."""
 
@@ -29,10 +30,13 @@ class ItemRepositoryProtocol(Protocol):
         ...
 
     def get_metrics_batch(
-        self, ids: list[int], metric_type: str = "score",
+        self,
+        ids: list[int],
+        metric_type: str = "score",
     ) -> Awaitable[dict[int, float]]:
         """Aggregated metrics for many items in 1 query."""
         ...
+
 
 class UnitOfWorkProtocol(Protocol):
     """Transaction boundary with repository access."""
@@ -55,6 +59,7 @@ class UnitOfWorkProtocol(Protocol):
 # src/infrastructure/persistence/repositories/items.py
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+
 
 class ItemRepository:
     def __init__(self, session: AsyncSession) -> None:
@@ -125,9 +130,9 @@ class DatabaseUnitOfWork:
 
     async def __aexit__(self, exc_type: type | None, *args: object) -> None:
         if exc_type is not None:
-            await self.rollback()           # Exception → rollback
+            await self.rollback()  # Exception → rollback
         elif not self._committed:
-            await self.commit()             # Clean exit → auto-commit
+            await self.commit()  # Clean exit → auto-commit
 
     async def commit(self) -> None:
         await self._session.commit()
@@ -159,6 +164,7 @@ async def execute_use_case[TResult](
         uow = get_unit_of_work(session)
         return await use_case_factory(uow)
 
+
 # Usage in route handler:
 result = await execute_use_case(
     lambda uow: CreateOrderUseCase().execute(CreateOrderCommand(...), uow)
@@ -177,8 +183,10 @@ Wrap repository methods with structured logging for diagnostics:
 import functools
 from loguru import logger
 
+
 def db_operation(operation_name: str):
     """Decorator: log database operations with timing and error context."""
+
     def decorator(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -190,14 +198,16 @@ def db_operation(operation_name: str):
             except Exception:
                 logger.exception(f"DB {operation_name} failed")
                 raise
+
         return wrapper
+
     return decorator
+
 
 # Usage
 class ItemRepository:
     @db_operation("find_by_ids")
-    async def find_by_ids(self, ids: list[int]) -> dict[int, Item]:
-        ...
+    async def find_by_ids(self, ids: list[int]) -> dict[int, Item]: ...
 ```
 
 ---
@@ -219,6 +229,7 @@ stmt = select(DBItem).options(selectinload(DBItem.tags))
 ```python
 # ❌ Caller will loop and create N queries
 async def get_by_id(self, id: int) -> Item | None: ...
+
 
 # ✓ Batch API — caller sends all IDs at once
 async def find_by_ids(self, ids: list[int]) -> dict[int, Item]: ...

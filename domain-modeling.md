@@ -17,15 +17,20 @@ Domain entities should be **frozen** (immutable) and **slotted** (memory-efficie
 import attrs
 from attrs import define, field, validators
 
+
 @define(frozen=True, slots=True)
 class Item:
     """Immutable domain entity with built-in validation."""
+
     id: int | None = None
     name: str = field(validator=validators.instance_of(str))
     tags: list[str] = field(factory=list, validator=_validate_tags)
     score: float = 0.0
 
-def _validate_tags(instance: object, attribute: attrs.Attribute, value: list[str]) -> None:
+
+def _validate_tags(
+    instance: object, attribute: attrs.Attribute, value: list[str]
+) -> None:
     """Custom validator — use for constraints Pydantic can't express."""
     if not all(isinstance(t, str) for t in value):
         raise TypeError("All tags must be strings")
@@ -47,12 +52,15 @@ original = Item(id=1, name="Widget", score=0.5)
 # Return new instance with updated fields — original is unchanged
 updated = attrs.evolve(original, score=0.9)
 
+
 # Chain transformations (functional pipeline)
 def boost_score(item: Item) -> Item:
     return attrs.evolve(item, score=min(item.score * 1.5, 1.0))
 
+
 def add_tag(item: Item, tag: str) -> Item:
     return attrs.evolve(item, tags=[*item.tags, tag])
+
 
 result = add_tag(boost_score(original), "promoted")
 ```
@@ -82,6 +90,7 @@ Every use case gets explicit **Command** (input) and **Result** (output) objects
 @define(frozen=True, slots=True)
 class CreateOrderCommand:
     """What the caller wants to do."""
+
     customer_id: str
     items: list[LineItem]
     priority: str = "normal"
@@ -91,9 +100,11 @@ class CreateOrderCommand:
         if self.priority == "rush" and len(self.items) > 100:
             raise ValueError("Rush orders limited to 100 items")
 
+
 @define(frozen=True, slots=True)
 class CreateOrderResult:
     """What the caller gets back — immutable snapshot of what happened."""
+
     order: Order
     items_processed: int
     warnings: list[str] = field(factory=list)
@@ -111,7 +122,9 @@ class CreateOrderResult:
 class CreateOrderUseCase:
     """Use case — always `async def execute(command, uow) -> Result`."""
 
-    async def execute(self, command: CreateOrderCommand, uow: UnitOfWork) -> CreateOrderResult:
+    async def execute(
+        self, command: CreateOrderCommand, uow: UnitOfWork
+    ) -> CreateOrderResult:
         # All use cases follow this exact signature pattern
         ...
 ```
@@ -125,17 +138,21 @@ Model failures as **domain objects**, not just exceptions. This enables partial 
 ```python
 from enum import Enum
 
+
 class FailureReason(Enum):
     """Classify failures into actionable categories."""
+
     NOT_FOUND = "not_found"
     API_ERROR = "api_error"
     INVALID_DATA = "invalid_data"
     RATE_LIMITED = "rate_limited"
     AUTH_EXPIRED = "auth_expired"
 
+
 @define(frozen=True, slots=True)
 class ProcessingFailure:
     """Structured failure — enough context to diagnose and retry intelligently."""
+
     entity_id: int | str
     reason: FailureReason
     service: str
@@ -148,6 +165,7 @@ Use failures in results instead of throwing:
 @define(frozen=True, slots=True)
 class BatchProcessResult:
     """Partial success is the norm — track what worked and what didn't."""
+
     succeeded: list[Item]
     failures: list[ProcessingFailure]
 
@@ -174,14 +192,16 @@ from typing import Literal
 
 MetricFormat = Literal["count", "percent", "duration", "bytes"]
 
+
 @define(frozen=True, slots=True)
 class SummaryMetric:
     """Metric that knows how to describe itself."""
-    name: str               # "items_processed"
-    value: int | float      # 1250
-    label: str              # "Items Processed"
+
+    name: str  # "items_processed"
+    value: int | float  # 1250
+    label: str  # "Items Processed"
     format: MetricFormat = "count"
-    significance: int = 0   # Display order (lower = more prominent)
+    significance: int = 0  # Display order (lower = more prominent)
 ```
 
 Build metrics in result factories:
@@ -189,12 +209,22 @@ Build metrics in result factories:
 ```python
 def create_import_result(data: ImportData) -> list[SummaryMetric]:
     metrics = [
-        SummaryMetric("imported", data.imported_count, "Imported", "count", significance=1),
-        SummaryMetric("skipped", data.skipped_count, "Skipped", "count", significance=3),
+        SummaryMetric(
+            "imported", data.imported_count, "Imported", "count", significance=1
+        ),
+        SummaryMetric(
+            "skipped", data.skipped_count, "Skipped", "count", significance=3
+        ),
     ]
     if data.success_rate > 0:
         metrics.append(
-            SummaryMetric("success_rate", data.success_rate, "Success Rate", "percent", significance=5)
+            SummaryMetric(
+                "success_rate",
+                data.success_rate,
+                "Success Rate",
+                "percent",
+                significance=5,
+            )
         )
     return sorted(metrics, key=lambda m: m.significance)
 ```
@@ -210,16 +240,20 @@ Distinguish "not provided" from "explicitly set to None" using a sentinel value:
 ```python
 from typing import Final
 
+
 class _Unset:
     """Sentinel: 'this parameter was not provided'."""
+
     __slots__ = ()
 
+
 UNSET: Final = _Unset()
+
 
 @define(frozen=True, slots=True)
 class UpdateItemCommand:
     id: int
-    name: str | _Unset = UNSET       # Not provided → keep current value
+    name: str | _Unset = UNSET  # Not provided → keep current value
     description: str | None | _Unset = UNSET  # None → clear, UNSET → keep, str → set
 ```
 

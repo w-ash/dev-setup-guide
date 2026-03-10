@@ -122,7 +122,12 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def internal_error(_: Request, exc: Exception) -> JSONResponse:
         return JSONResponse(
             status_code=500,
-            content={"error": {"code": "INTERNAL_ERROR", "message": "An internal error occurred"}},
+            content={
+                "error": {
+                    "code": "INTERNAL_ERROR",
+                    "message": "An internal error occurred",
+                }
+            },
         )
 ```
 
@@ -152,7 +157,7 @@ def create_app() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173"],  # Vite dev server
+        allow_origins=["http://localhost:5173"],  # Match your Vite port
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
