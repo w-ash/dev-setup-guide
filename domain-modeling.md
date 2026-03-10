@@ -5,7 +5,7 @@
 > **Deliverables**: Domain entities, use case commands/results, failure types, summary metrics
 > **Estimated effort**: M
 
-Pure domain modeling patterns that keep business logic safe, testable, and composable. No database, no ORM, no infrastructure — these apply to any Python backend.
+No database or infrastructure required — these patterns apply to any Python backend.
 
 ---
 

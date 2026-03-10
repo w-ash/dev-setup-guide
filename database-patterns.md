@@ -7,8 +7,6 @@
 
 **Skip this file** if your project doesn't use a database (API gateways, CLI tools wrapping external services, serverless functions). [Domain Modeling](domain-modeling.md) and [External API Resilience](external-api-resilience.md) still apply.
 
-Database patterns for SQLAlchemy 2.0 async with Clean Architecture: batch-first repository APIs, Unit of Work lifecycle, and eager loading strategies.
-
 ---
 
 ## Repository Protocol Interfaces
@@ -81,7 +79,7 @@ class ItemRepository:
 
 1. **Empty-collection guards**: Always check `if not ids: return {}` before querying. Without this, `WHERE id IN ()` is invalid SQL in some engines and wasteful in all of them.
 
-2. **`selectinload()` for all relationships**: SQLAlchemy's default lazy loading fires a separate query per-item per-relationship. With 100 items × 2 relationships, that's 201 queries instead of 3.
+2. **`selectinload()` for all relationships**: SQLAlchemy's default lazy loading fires a separate query per-item per-relationship. With 100 items × 2 relationships, that's 201 queries instead of 3. Use `joinedload()` only for single-object (many-to-one) relationships — it uses JOINs which cause cartesian products with collections.
 
 3. **Dict returns keyed by ID**: Callers get `O(1)` lookups and can immediately see which requested IDs are missing.
 
@@ -115,6 +113,8 @@ The Unit of Work manages the transaction boundary: **auto-commit on success, aut
 
 ```python
 # src/infrastructure/persistence/unit_of_work.py
+from typing import Self
+
 class DatabaseUnitOfWork:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session

@@ -172,6 +172,27 @@ afterEach(() => { server.resetHandlers(); cleanup(); });
 afterAll(() => server.close());
 ```
 
+### Overriding Handlers for Error States
+
+Override the auto-generated happy-path handlers per-test to test error scenarios:
+
+```typescript
+import { http, HttpResponse } from "msw";
+import { server } from "@/test/setup";
+
+test("shows error message on API failure", async () => {
+  server.use(
+    http.get("/api/v1/items", () =>
+      HttpResponse.json(
+        { error: { code: "INTERNAL_ERROR", message: "DB unavailable" } },
+        { status: 500 },
+      ),
+    ),
+  );
+  // render component and assert error UI is displayed
+});
+```
+
 ### renderWithProviders
 
 ```tsx

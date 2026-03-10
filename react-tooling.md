@@ -37,6 +37,19 @@ export default defineConfig({
 
 Key features: Tailwind v4 plugin, `@/` import alias, and `/api` proxy to FastAPI during development.
 
+### Tailwind v4 Setup
+
+```bash
+pnpm add tailwindcss @tailwindcss/vite
+```
+
+Entry point CSS (`web/src/index.css`):
+```css
+@import "tailwindcss";
+```
+
+Tailwind v4 uses automatic content detection — no `tailwind.config.js` needed. Design tokens use `@theme` blocks in CSS instead of JS config.
+
 ---
 
 ## TypeScript Configuration

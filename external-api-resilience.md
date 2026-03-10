@@ -5,8 +5,6 @@
 > **Deliverables**: Error classifier hierarchy, retry policy factory, HTTP client with event hooks, SSE progress pattern
 > **Estimated effort**: M
 
-Resilience patterns for projects that call external APIs — with or without a database. Covers error classification, structured retry policies, HTTP client observability, and real-time progress streaming.
-
 ---
 
 ## Error Classification Protocol
@@ -162,6 +160,16 @@ def _log_retry(config: RetryConfig):
 
 **Why config as data**: All retry behavior is visible in one object. No hunting through decorator chains to find "what's the max retry count?" Settings files can override `max_attempts` per service without code changes.
 
+### Usage in a Connector Method
+
+```python
+config = RetryConfig(service_name="Stripe", classifier=StripeErrorClassifier())
+
+async for attempt in RetryPolicyFactory.create(config):
+    with attempt:
+        response = await client.get("/v1/charges")
+```
+
 ---
 
 ## HTTP Client Factories with Event Hooks
@@ -270,7 +278,8 @@ async def start_import(body: ImportRequest) -> OperationStartedResponse:
 
 ```python
 @router.get("/operations/{operation_id}/progress")
-async def stream_progress(operation_id: str) -> EventSourceResponse:
+async def stream_progress(operation_id: str) -> "EventSourceResponse":
+    # pip install sse-starlette; from sse_starlette.sse import EventSourceResponse
     queue = await registry.get_queue(operation_id)
     if queue is None:
         raise HTTPException(404, "Unknown operation")

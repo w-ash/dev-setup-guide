@@ -5,8 +5,6 @@
 > **Deliverables**: `execute_use_case()` runner, route handlers delegating to use cases, error envelope middleware, OpenAPI export
 > **Estimated effort**: M
 
-Clean Architecture patterns for FastAPI: layered dependency flow, use case runner, thin route handlers, consistent error envelopes, and OpenAPI spec generation for frontend codegen.
-
 ---
 
 ## Clean Architecture
@@ -75,6 +73,21 @@ async def get_item(item_id: int) -> ItemResponse:
 ```
 
 Route handlers should be 5-10 lines. All business logic lives in use cases.
+
+### Response Schema with `from_domain()`
+
+```python
+# src/interface/api/schemas/items.py
+from pydantic import BaseModel
+
+class ItemResponse(BaseModel):
+    id: int
+    name: str
+
+    @classmethod
+    def from_domain(cls, item: Item) -> "ItemResponse":
+        return cls(id=item.id, name=item.name)
+```
 
 ---
 

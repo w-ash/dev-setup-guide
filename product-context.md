@@ -5,7 +5,7 @@
 > **Deliverables**: Answers to 5 product questions, recorded in README.md and CLAUDE.md
 > **Estimated effort**: XS
 
-A coding agent that doesn't understand the product will make wrong trade-offs. Answer these questions before writing CLAUDE.md, before planning the backlog, before writing code.
+Answer these questions before writing CLAUDE.md or planning the backlog.
 
 ---
 
@@ -86,7 +86,7 @@ The same answers go in three places, each serving a different reader:
 
 If you're using this guide with a coding agent and haven't provided product context:
 
-**The agent should ask.** Before writing CLAUDE.md or creating a backlog, the agent should prompt you with these five questions. Quick, rough answers are fine — they can be refined later. No answers means the agent is guessing.
+The agent should prompt you with these five questions before proceeding. Quick, rough answers are fine.
 
 Add this to your CLAUDE.md so the agent knows to ask:
 

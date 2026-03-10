@@ -5,8 +5,6 @@
 > **Deliverables**: Team familiarity with modern Python idioms; Ruff and BasedPyright configured to enforce them
 > **Estimated effort**: S (reference material, not implementation)
 
-Each pattern shows the modern way and the legacy way it replaces.
-
 ---
 
 ## Generics (PEP 695)
@@ -76,7 +74,7 @@ results = await asyncio.gather(fetch_users(), fetch_orders())
 except TimeoutError, ConnectionError:
     handle_network_error()
 
-# Previous style (still works)
+# Without PEP 758
 except (TimeoutError, ConnectionError):
     handle_network_error()
 ```

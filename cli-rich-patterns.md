@@ -163,7 +163,12 @@ async def run_with_progress(operations: list[Operation]) -> None:
             progress.update(task_id, description=f"[green]✓[/green] {op.name}")
 ```
 
-**Sub-operation indenting**: Display child operations as `  ↳ Description` for visual hierarchy.
+**Sub-operation indenting**: Display child operations as indented tasks for visual hierarchy:
+
+```python
+sub_task = progress.add_task(f"  ↳ {sub_op.name}", total=sub_op.total_items)
+progress.update(sub_task, advance=1)
+```
 
 ---
 

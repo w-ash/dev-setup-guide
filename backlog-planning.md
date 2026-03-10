@@ -5,19 +5,6 @@
 > **Deliverables**: `docs/backlog/README.md` (master status), version files (`v0.X.x.md`), `unscheduled.md`
 > **Estimated effort**: S
 
-A structured approach to project planning using version-scoped roadmap files. Tracks epics, stories, dependencies, and effort — with a master README as the single source of truth for project status.
-
----
-
-## Why This Structure
-
-Most projects either have no roadmap (everything in someone's head) or use issue trackers that become graveyards of stale tickets. This file-based approach:
-
-- **Lives in the repo** — version-controlled, reviewed in PRs, always up to date
-- **Scales to one person or a small team** — no tool overhead
-- **Provides transparency** — anyone (including Claude Code) can see the full roadmap
-- **Preserves history** — completed work moves to an archive, not deleted
-
 ---
 
 ## Directory Structure
@@ -46,8 +33,6 @@ docs/
 ---
 
 ## Master README (backlog/README.md)
-
-The README is a one-page view of the entire project direction.
 
 ### Template
 
@@ -83,17 +68,9 @@ Shows which capabilities exist at each version:
 - **Frontend**: React 19 + Tanstack Query + Tailwind v4
 ```
 
-### What Makes This Effective
-
-- **Version matrix** is the first thing anyone sees — instant project orientation
-- **Infrastructure readiness** shows capability progression across versions
-- **Technical decisions** are recorded once, not scattered across issues
-
 ---
 
 ## Version File Format
-
-Each version file follows a consistent structure.
 
 ### Template
 
@@ -163,7 +140,7 @@ When a story ships, check the box and add a completion date:
 
 ### Effort Estimates
 
-Relative sizing — never time-based. Prevents false precision and focuses on complexity:
+Relative sizing — never time-based:
 
 | Size | Meaning | Example |
 |---|---|---|
@@ -262,7 +239,7 @@ Keep it simple — bullets with enough context to remember the idea. Full story 
 
 ## Bootstrapping from This Guide
 
-When using the [Getting Started guide](README.md) to set up a new project, create your first version file by mapping guide phases to backlog stories. This ensures every task is tracked and nothing falls through the cracks.
+When using the [Getting Started guide](README.md) to set up a new project, create your first version file by mapping guide phases to backlog stories.
 
 ### Example: `docs/backlog/v0.0.x.md`
 
@@ -325,4 +302,4 @@ From the [Getting Started guide](../../docs/dev-setup-guide/README.md).
 
 ```
 
-**Adapt to your project**: Skip epics that don't apply (no CLI? drop the CLI epic). Skip individual stories (no database? drop Database Patterns). Version priorities should reflect your product goals from [Product Context](product-context.md) — the backlog serves the product, not the other way around.
+**Adapt to your project**: Skip epics that don't apply (no CLI? drop the CLI epic). Skip individual stories (no database? drop Database Patterns). Version priorities should reflect your product goals from [Product Context](product-context.md).

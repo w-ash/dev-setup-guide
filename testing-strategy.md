@@ -5,18 +5,16 @@
 > **Deliverables**: Test directory structure mirroring source, factory fixtures, conftest.py with auto-markers
 > **Estimated effort**: S
 
-Test pyramid ratios, placement rules by architectural layer, factory fixtures, auto-markers, and coverage targets. Works with both pytest (backend) and Vitest (frontend).
-
 ---
 
 ## Test Pyramid
 
 ```
-         /   E2E   \           5%  — Playwright (Chromium desktop)
+         /   E2E   \           Playwright (Chromium desktop)
         /------------\
-       / Integration  \       35%  — pytest (real DB), Vitest (MSW)
+       / Integration  \       pytest (real DB), Vitest (MSW)
       /----------------\
-     /    Unit Tests    \     60%  — pytest (pure logic), Vitest (components)
+     /    Unit Tests    \     pytest (pure logic), Vitest (components)
     /--------------------\
 ```
 
@@ -157,7 +155,8 @@ async def db_session() -> AsyncGenerator[AsyncSession]:
     original_url = os.environ.get("DATABASE_URL")
     os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{db_file}"
 
-    reset_engine_cache()  # Force SQLAlchemy to create new engine with new URL
+    reset_engine_cache()  # Clear the cached engine so a fresh one is created with the new URL
+    # Implementation: set the module-level _engine variable to None in your database module
     await init_db()       # Run migrations to create schema
 
     session = get_session_factory()()

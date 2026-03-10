@@ -5,13 +5,11 @@
 > **Deliverables**: Settings module with typed fields, constants module, logging configuration
 > **Estimated effort**: S
 
-Foundation patterns every Python project benefits from: typed configuration that validates at startup, organized constants, and structured logging. No database required.
-
 ---
 
 ## Typed Settings with Pydantic
 
-Use `pydantic-settings` with **Annotated types** for semantic validation. Invalid config fails at startup, not at 3 AM in production.
+Use `pydantic-settings` with **Annotated types** for semantic validation. Invalid config fails at startup instead of at runtime.
 
 ```python
 # src/config/settings.py

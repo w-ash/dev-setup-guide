@@ -5,13 +5,11 @@
 > **Deliverables**: Design identity answers documented, `.claude/rules/web-design-system.md` written with your project's specific aesthetic
 > **Estimated effort**: M
 
-Before writing a single component, define your application's visual identity. This section is about the *process* of making intentional design choices — not a specific aesthetic to copy.
-
 ---
 
 ## The Sameness Problem
 
-Every major LLM trains on the same Bootstrap layouts, Tailwind templates, and UI kit screenshots. Without specific guidance, they converge on the **statistical average of "website"** — indigo gradients, uniform card grids, identical spacing, glassmorphism everywhere. The result: every AI-assisted project looks identical. Assembly-line output with no soul, no emotional connection, no craft.
+Every major LLM trains on the same Bootstrap layouts, Tailwind templates, and UI kit screenshots. Without specific guidance, they converge on the **statistical average of "website"** — indigo gradients, uniform card grids, identical spacing, glassmorphism everywhere. The result: every AI-assisted project looks identical.
 
 The fix isn't avoiding AI tools — it's giving them a strong, specific identity to enforce.
 
@@ -51,7 +49,7 @@ A visual system is a set of constrained, intentional tokens — not a component 
 
 | Token | What to decide | Why it matters |
 |---|---|---|
-| **Type scale** | 2-3 font families, a size scale, hierarchy rules | Typography IS identity. Default Tailwind sizes with Inter is the #1 AI-slop signal. |
+| **Type scale** | 2-3 font families, a size scale, hierarchy rules | Typography IS identity — it's the single strongest signal of whether a human made design choices. See the font selection callout below. |
 | **Color palette** | A constrained palette (monochrome + 1-2 accents) | Not the AI default indigo. Choose colors that reflect your app's personality. |
 | **Spacing scale** | A defined rhythm (4px, 8px, 12px, 16px, 24px, 32px, 48px) | Vary the rhythm. Uniform spacing between everything is a dead giveaway. |
 | **Depth system** | How to distinguish surface levels (shadow, border, background) | Not every card at the same elevation. Create hierarchy through depth. |
@@ -59,13 +57,27 @@ A visual system is a set of constrained, intentional tokens — not a component 
 
 **The defensibility test**: for every element on screen, you should be able to explain why it exists and why it's positioned where it is. If you can't, cut it.
 
+### Font Selection
+
+**Never use Inter.** It's the default that every AI tool and Tailwind template reaches for — the typographic equivalent of `bg-indigo-500`. If your app uses Inter, it signals that nobody made a design choice.
+
+Font choice should match the character of your system:
+
+- Music/media tool → geometric sans + editorial serif (Space Grotesk + Newsreader)
+- Developer tool → monospace-forward (JetBrains Mono, Berkeley Mono)
+- Creative tool → humanist sans (Satoshi, General Sans)
+- Documentation → readable serif (Literata, Source Serif)
+
+**The test**: swap your font for Inter. If nothing feels lost, your font wasn't doing any work.
+
 ---
 
 ## Step 3: Avoid Universal Anti-Patterns
 
-These patterns signal "AI generated this" regardless of your specific aesthetic:
+Universal anti-patterns:
 
 **Visual cliches:**
+- **Default typeface (Inter)** — see Font Selection above
 - Purple/blue/indigo gradient as primary palette (the Tailwind default that every LLM reaches for)
 - Glassmorphism/frosted glass as the entire design foundation (fine as a surgical accent on one element)
 - Random blobby decorative background shapes that serve no purpose
@@ -77,7 +89,7 @@ These patterns signal "AI generated this" regardless of your specific aesthetic:
 **Structural anti-patterns:**
 - **Only designing the happy path** — you must handle empty states, error states, loading states, single items, overflow, and long text. AI only generates the golden-path screenshot.
 - **Frankenstein layouts** — sections that feel randomly assembled (hero, then cards, then testimonials, then CTA) without narrative flow
-- **Over-generation** — more UI elements than necessary. Every unnecessary gridline, heavy border, or decorative effect is cognitive load. Less is more.
+- **Over-generation** — more UI elements than necessary. Every unnecessary gridline, heavy border, or decorative effect is cognitive load.
 - **No design system ownership** — screens look smooth in isolation but spacing scales, type tokens, and composition rules are inconsistent across pages
 - **Placeholder content in production** — "Lorem ipsum" and "Song Title x5" never got replaced with real data
 
