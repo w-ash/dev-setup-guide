@@ -5,15 +5,15 @@
 > **Deliverables**: Design identity answers documented, `.claude/rules/web-design-system.md` written with your project's specific aesthetic
 > **Estimated effort**: M
 
-Before writing a single component, define your application's visual identity. This section is about the *process* of making intentional design choices — not a specific aesthetic to copy.
+Before writing a single component, define your application's visual identity. The goal: interactions that feel **familiar enough to be intuitive, but distinctive enough to engage**. This guide covers the *process* of making intentional design choices — not a specific aesthetic to copy.
 
 ---
 
-## The Sameness Problem
+## Why This Matters
 
-Every major LLM trains on the same Bootstrap layouts, Tailwind templates, and UI kit screenshots. Without specific guidance, they converge on the **statistical average of "website"** — indigo gradients, uniform card grids, identical spacing, glassmorphism everywhere. The result: every AI-assisted project looks identical. Assembly-line output with no soul, no emotional connection, no craft.
+LLMs train on the same Bootstrap layouts, Tailwind templates, and UI kit screenshots. Without specific guidance, they converge on the **statistical average of "website"** — indigo gradients, uniform card grids, identical spacing, glassmorphism. Every AI-assisted project ends up looking the same.
 
-The fix isn't avoiding AI tools — it's giving them a strong, specific identity to enforce.
+The fix: give AI tools a strong, specific identity to enforce. Ground every design decision in your users' needs and your app's personality. Users should feel like someone thoughtful built this for them — not like they're using a template.
 
 ---
 
@@ -39,7 +39,7 @@ Answer three questions before touching CSS. These answers drive every visual dec
 - Immersed and inspired? → Rich media, dark themes, atmospheric textures
 - Playful and exploratory? → Bold colors, asymmetric layouts, personality in micro-copy
 
-Write these answers down. They become your design brief — the "why" behind every visual choice.
+Write these answers down. They become your design brief — the "why" behind every visual choice. Every token, layout, and interaction should trace back to these answers. If a design choice doesn't serve the user's needs or reinforce the intended feeling, question it.
 
 ---
 
@@ -51,49 +51,63 @@ A visual system is a set of constrained, intentional tokens — not a component 
 
 | Token | What to decide | Why it matters |
 |---|---|---|
-| **Type scale** | 2-3 font families, a size scale, hierarchy rules | Typography IS identity. Default Tailwind sizes with Inter is the #1 AI-slop signal. |
-| **Color palette** | A constrained palette (monochrome + 1-2 accents) | Not the AI default indigo. Choose colors that reflect your app's personality. |
-| **Spacing scale** | A defined rhythm (4px, 8px, 12px, 16px, 24px, 32px, 48px) | Vary the rhythm. Uniform spacing between everything is a dead giveaway. |
-| **Depth system** | How to distinguish surface levels (shadow, border, background) | Not every card at the same elevation. Create hierarchy through depth. |
+| **Type scale** | 2-3 font families, a size scale, hierarchy rules | Typography is identity. Choose fonts that match your app's personality and audience — explore Fontshare, Google Fonts beyond page 1. Use high-contrast weight pairing (light body, bold headlines). |
+| **Color palette** | A constrained palette (monochrome + 1-2 accents) | Generate from a single brand seed color using OKLCH or HCT color spaces. Define semantic tokens (`--brand`, `--accent`, `--surface`), not raw hex values. |
+| **Spacing scale** | A defined rhythm (4px, 8px, 12px, 16px, 24px, 32px, 48px) | Vary the rhythm between sections. Tighter spacing within groups, more breathing room between them. |
+| **Depth system** | How to distinguish surface levels (shadow, border, background) | Define 3-5 named elevation levels with consistent shadow recipes. Create hierarchy through depth — not every card at the same level. |
 | **Motion language** | When things move, how fast, what easing | Animations guide attention, not impress. 150ms for interactions, 300ms for layout. |
 
 **The defensibility test**: for every element on screen, you should be able to explain why it exists and why it's positioned where it is. If you can't, cut it.
 
 ---
 
-## Step 3: Avoid Universal Anti-Patterns
+## Step 3: Recognize and Replace AI Default Patterns
 
-These patterns signal "AI generated this" regardless of your specific aesthetic:
+These patterns appear in virtually every AI-generated interface. Each one has a specific, better alternative.
 
-**Visual cliches:**
-- Purple/blue/indigo gradient as primary palette (the Tailwind default that every LLM reaches for)
-- Glassmorphism/frosted glass as the entire design foundation (fine as a surgical accent on one element)
-- Random blobby decorative background shapes that serve no purpose
-- Every container with identical `rounded-xl border bg-card p-4` — no visual hierarchy
-- Uniform spacing between all sections — no rhythm variation
-- `animate-pulse` skeleton loaders (use shimmer gradients or content-shaped placeholders)
-- Native browser `<select>`, checkboxes, and radio buttons in a dark theme
+**Typography defaults:**
+- Inter, Roboto, Open Sans, Lato, Arial — these dominate LLM training data and produce instantly recognizable sameness
+- One font weight throughout — intentional design uses high-contrast weight variation (300 for body, 700+ for headlines)
+- Default Tailwind type scale with no customization
 
-**Structural anti-patterns:**
-- **Only designing the happy path** — you must handle empty states, error states, loading states, single items, overflow, and long text. AI only generates the golden-path screenshot.
-- **Frankenstein layouts** — sections that feel randomly assembled (hero, then cards, then testimonials, then CTA) without narrative flow
-- **Over-generation** — more UI elements than necessary. Every unnecessary gridline, heavy border, or decorative effect is cognitive load. Less is more.
-- **No design system ownership** — screens look smooth in isolation but spacing scales, type tokens, and composition rules are inconsistent across pages
-- **Placeholder content in production** — "Lorem ipsum" and "Song Title x5" never got replaced with real data
+**Color defaults:**
+- `indigo-500` / `indigo-600` as primary color — Tailwind's demo color became the statistical default for every AI-generated button and link
+- Purple-to-blue or pink-to-purple gradients as backgrounds or CTAs
+- Gradient text on body copy (also fails WCAG contrast)
+- Raw Tailwind palette colors with no semantic naming
 
-**The real-content test**: always design with actual data — long names, empty lists, single items, overflow text. AI-generated UIs fall apart with real content.
+**Layout defaults:**
+- Centered hero text + CTA button + three feature cards with icons — the "SaaS landing page trinity"
+- Every container with identical `rounded-xl border bg-card p-4`
+- Uniform spacing between all sections with no rhythm variation
+- Bento grids filled with decorative stock imagery
+
+**Component defaults:**
+- `animate-pulse` skeleton loaders (use shimmer gradients or content-shaped placeholders instead)
+- Cards with no hover, focus, or empty states — only the happy path
+- Native browser `<select>`, checkboxes, and radio buttons left unstyled in dark themes
+- Inconsistent shadows per component — define 3-5 named elevation levels and use them everywhere
+- Random blobby decorative background shapes, "light leak" effects
+
+**Structural patterns:**
+- **Only the happy path** — handle empty states, error states, loading states, overflow, and edge cases. AI generates the golden-path screenshot; a real app needs every state.
+- **Over-generation** — more UI elements than the content needs. Every unnecessary border, gridline, or decorative element adds cognitive load.
+- **Inconsistent tokens** — screens look fine in isolation but spacing, type, radius, and shadow values drift across pages
+- **Placeholder content in production** — "Lorem ipsum", "Item 1", "Welcome to..." never got replaced with real data
+
+**The real-content test**: design with actual data — long names, empty lists, single items, overflow text. Intentional designs handle these gracefully because every state was considered.
 
 ---
 
 ## Modern Trends Worth Considering (2025-2026)
 
-The dominant design response to AI saturation is **deliberate imperfection and tactile warmth**:
+Current design direction emphasizes **deliberate craft and tactile warmth**:
 
-- **Texture and grain** — noise overlays, layered textures that feel physical, not sterile. Breaks the "flat digital" monotony that AI defaults to.
+- **Texture and grain** — noise overlays, layered textures that feel physical. Layered CSS backgrounds with subtle patterns add depth that flat surfaces lack.
 - **Technical mono / code brutalism** — monospaced type, terminal aesthetics, raw data presentation. Particularly strong for developer tools and data-heavy apps.
 - **Intentional motion** — animations that guide attention and confirm actions, not impress. Subtle microinteractions that make interfaces feel alive.
 - **Asymmetry and broken grids** — expressive layouts that break the 12-column grid with purpose. Not chaos — intentional variation.
-- **Anti-corporate warmth** — hand-drawn accents, organic shapes, wonky serifs. Signals "a human made choices here."
+- **Organic warmth** — hand-drawn accents, organic shapes, character-rich serifs. Design that feels like someone cared about it.
 - **Monochromatic + meaningful accent** — one or two accent colors used sparingly and with purpose (the Linear approach). Powerful alternative to the "rainbow of Tailwind defaults."
 
 These are options, not requirements. Pick what fits your identity — the point is making deliberate choices, not following every trend.
@@ -142,3 +156,5 @@ crate-digger," not the casual listener. Precise, data-rich, intentionally crafte
 ```
 
 A different project would make entirely different choices. A children's education app might specify bold primary colors, rounded playful shapes, and generous whitespace. A fintech dashboard might specify tight data density, monochrome with green/red accents, and no decorative elements. **The structure is the same; the choices are yours.**
+
+The goal is always the same: interactions that feel **familiar enough to be immediately usable** (users shouldn't have to learn a new paradigm) **but distinctive enough to be engaging** (users shouldn't feel like they're using a cookie-cutter template). Root every choice in what your users need and how you want them to feel.
