@@ -59,10 +59,6 @@ Set up the backlog before building anything. Use it to plan all remaining guide 
 
 - [ ] **[Testing Strategy](testing-strategy.md)** — Test pyramid, placement by layer, fixtures, coverage targets `[S]`
 
-### Phase 7: CI/CD
-
-- [ ] **[CI/CD](ci-cd.md)** — GitHub Actions quality gates, Claude Code @mention workflow `[XS]`
-
 ---
 
 ## Essential Commands Cheat Sheet

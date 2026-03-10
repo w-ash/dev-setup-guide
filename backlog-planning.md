@@ -323,9 +323,6 @@ From the [Getting Started guide](../../docs/dev-setup-guide/README.md).
 - [ ] **Testing Strategy** — Effort: S — [guide](../../docs/dev-setup-guide/testing-strategy.md)
     - What: Test pyramid, placement rules, factory fixtures, auto-markers
 
-#### Process Epic
-- [ ] **CI/CD** — Effort: XS — [guide](../../docs/dev-setup-guide/ci-cd.md)
-    - What: GitHub Actions quality gates, Claude Code @mention workflow
 ```
 
 **Adapt to your project**: Skip epics that don't apply (no CLI? drop the CLI epic). Skip individual stories (no database? drop Database Patterns). Version priorities should reflect your product goals from [Product Context](product-context.md) — the backlog serves the product, not the other way around.

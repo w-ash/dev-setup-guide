@@ -45,7 +45,6 @@ These reference other guides — work through them in phase order:
 - [ ] Frontend tooling (biome, tsconfig, vite) → [React Tooling](react-tooling.md)
 - [ ] API client + test infra → [React API & Testing](react-api-testing.md)
 - [ ] Database + Alembic init (if applicable) → `alembic init alembic` → [Database Patterns](database-patterns.md)
-- [ ] `.github/workflows/` → [CI/CD](ci-cd.md)
 - [ ] Health check endpoint — verify the full stack works end to end
 - [ ] Run all quality gates — confirm a clean baseline
 
