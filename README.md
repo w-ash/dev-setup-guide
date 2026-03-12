@@ -34,7 +34,7 @@ Set up the backlog before building anything. Use it to plan all remaining guide 
 
 ### Phase 4: Language & Tooling
 
-- [ ] **[Python Tooling](python-tooling.md)** — Poetry, Ruff, BasedPyright, pytest, pre-commit `[S]`
+- [ ] **[Python Tooling](python-tooling.md)** — uv, Ruff, BasedPyright, pytest, pre-commit `[S]`
 - [ ] **[Python 3.14+ Syntax](python-syntax.md)** — Modern patterns: 8 PEPs with DO/DON'T examples `[S]`
 - [ ] **[Project Configuration](project-configuration.md)** — Typed settings, organized constants, structured logging `[S]`
 

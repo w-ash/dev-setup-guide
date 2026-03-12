@@ -258,7 +258,7 @@ From the [Getting Started guide](../../docs/dev-setup-guide/README.md).
 
 #### Language & Tooling Epic
 - [ ] **Python Tooling** — Effort: S — [guide](../../docs/dev-setup-guide/python-tooling.md)
-    - What: Configure Poetry, Ruff, BasedPyright, pytest, pre-commit
+    - What: Configure uv, Ruff, BasedPyright, pytest, pre-commit
 - [ ] **Python 3.14+ Syntax** — Effort: S — [guide](../../docs/dev-setup-guide/python-syntax.md)
     - What: Review modern syntax patterns, add to CLAUDE.md
 - [ ] **Project Configuration** — Effort: S — [guide](../../docs/dev-setup-guide/project-configuration.md)
