@@ -73,7 +73,7 @@ paths:
 ---
 # Version Management
 Version lives in pyproject.toml only. After bumping:
-1. `poetry install` — updates installed metadata
+1. `uv sync` — updates installed metadata
 2. `pnpm --prefix web sync-api` — exports OpenAPI schema + Orval codegen
 ```
 

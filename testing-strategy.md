@@ -229,13 +229,13 @@ Run only the tests for the code you changed. Stop on first failure to fix immedi
 
 ```bash
 # Backend: run the specific test file
-poetry run pytest tests/unit/domain/test_matching.py -x
+uv run pytest tests/unit/domain/test_matching.py -x
 
 # Iterate on a single failing test
-poetry run pytest tests/unit/domain/test_matching.py -x -k "test_exact_match"
+uv run pytest tests/unit/domain/test_matching.py -x -k "test_exact_match"
 
 # Rerun only previously-failed tests
-poetry run pytest --lf
+uv run pytest --lf
 
 # Frontend: run the specific test file
 pnpm --prefix web test src/components/TrackCard.test.tsx
@@ -246,16 +246,16 @@ pnpm --prefix web test src/components/TrackCard.test.tsx
 Catch cross-cutting regressions before they hit version control.
 
 ```bash
-poetry run pytest                    # Excludes slow/diagnostic markers
+uv run pytest                    # Excludes slow/diagnostic markers
 pnpm --prefix web test               # All frontend tests
 ```
 
 ### Full verification — version bumps, dep updates, or on request
 
 ```bash
-poetry run pytest -m ""              # All tests including slow
-poetry run basedpyright src/         # Type check
-poetry run ruff check .              # Lint
+uv run pytest -m ""              # All tests including slow
+uv run basedpyright src/         # Type check
+uv run ruff check .              # Lint
 pnpm --prefix web check && pnpm --prefix web build
 ```
 
@@ -273,12 +273,12 @@ Add this to your CLAUDE.md Testing section so agents follow the policy:
 ```markdown
 ### When to Run What
 **During implementation** — targeted tests ONLY:
-- `poetry run pytest tests/path/to/test_file.py -x`
+- `uv run pytest tests/path/to/test_file.py -x`
 - `-k "test_name"` to iterate on a single failing test
 - `--lf` to rerun only previously-failed tests
 
 **Before committing** — full fast suite:
-- `poetry run pytest` + `pnpm --prefix web test`
+- `uv run pytest` + `pnpm --prefix web test`
 
 **NEVER** run the full suite after every small edit.
 ```

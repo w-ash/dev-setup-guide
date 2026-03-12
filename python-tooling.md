@@ -1,6 +1,6 @@
 # Python 3.14+ Tooling Setup
 
-> **Scope**: Poetry, Ruff, BasedPyright, pytest, and pre-commit hook configuration
+> **Scope**: uv, Ruff, BasedPyright, pytest, and pre-commit hook configuration
 > **Prerequisites**: [Project Structure](project-structure.md)
 > **Deliverables**: `pyproject.toml` with all tool configs, `.pre-commit-config.yaml`, tools running cleanly
 > **Estimated effort**: S
@@ -9,9 +9,9 @@ Modern Python syntax patterns (PEP 695, 604, 649, etc.) are covered separately i
 
 ---
 
-## Poetry
+## uv
 
-Initialize with `poetry init`, then configure `pyproject.toml`:
+Initialize with `uv init`, then configure `pyproject.toml`:
 
 **Core dependencies** (adjust to your project):
 ```
@@ -185,10 +185,6 @@ repos:
     -   id: ruff
         args: [--fix]
     -   id: ruff-format
--   repo: https://github.com/python-poetry/poetry
-    rev: 1.8.0
-    hooks:
-    -   id: poetry-check
 ```
 
 No Black hook needed — Ruff handles both linting and formatting.

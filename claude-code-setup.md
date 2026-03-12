@@ -59,11 +59,11 @@ Fill in the product sections from your [Product Context](product-context.md) wor
 2. Right level? Domain=unit, UseCase=unit+mocks, Repository=integration
 3. Beyond happy path? Error cases, edge cases, validation
 4. Using existing factories from tests/fixtures/?
-5. Tests pass? `poetry run pytest tests/path/to/test_file.py -x`
+5. Tests pass? `uv run pytest tests/path/to/test_file.py -x`
 
 ### When to Run What
 - **During implementation**: targeted test file only (`-x`, `-k`, `--lf`)
-- **Before committing**: `poetry run pytest` (full fast suite)
+- **Before committing**: `uv run pytest` (full fast suite)
 - **NEVER** run the full suite after every small edit
 
 ## Documentation Map
@@ -75,7 +75,7 @@ Fill in the product sections from your [Product Context](product-context.md) wor
 - **Use imperative language**: "YOU MUST FOLLOW" — Claude treats CLAUDE.md as authoritative instructions
 - **Keep it under 300 lines** — lines beyond that risk context truncation; link to deeper docs
 - **Include a Self-Check pattern** — a checklist Claude runs after every implementation to catch its own gaps
-- **Be specific about commands** — include the exact `poetry run` prefix, flag combinations, etc.
+- **Be specific about commands** — include the exact `uv run` prefix, flag combinations, etc.
 
 ---
 
@@ -94,7 +94,7 @@ Hooks run automatically after Claude uses the Edit or Write tools. This ensures 
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // empty' | xargs -I{} poetry run ruff check {} --fix --quiet 2>/dev/null; exit 0"
+            "command": "jq -r '.tool_input.file_path // empty' | xargs -I{} uv run ruff check {} --fix --quiet 2>/dev/null; exit 0"
           }
         ]
       },
@@ -127,10 +127,10 @@ This file is **gitignored** — it's per-developer. It controls what Claude can 
 {
   "permissions": {
     "allow": [
-      "Bash(poetry run pytest:*)",
-      "Bash(poetry run ruff check:*)",
-      "Bash(poetry run ruff format:*)",
-      "Bash(poetry run basedpyright:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff check:*)",
+      "Bash(uv run ruff format:*)",
+      "Bash(uv run basedpyright:*)",
       "Bash(pnpm:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",

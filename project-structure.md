@@ -29,7 +29,7 @@ git branch -m main                    # Default branch = main
 - [ ] **.python-version** — pin your Python version for pyenv/asdf/mise: `echo "3.14" > .python-version`
 - [ ] **.env.example** — document all required env vars (committed to git)
 - [ ] **.env** — actual secret values (gitignored, never committed)
-- [ ] **`poetry init`** → creates `pyproject.toml`, then `poetry install` → creates `.venv/`
+- [ ] **`uv init`** → creates `pyproject.toml`, then `uv sync` → creates `.venv/`
 - [ ] **`__init__.py`** — create in every Python package dir AND every test dir (prevents module name collisions)
 - [ ] **Initial commit** — clean baseline: `git add -A && git commit -m "chore: project scaffold"`
 
@@ -70,7 +70,7 @@ What it does, who it's for, and what problem it solves. Fill this in from your [
 ## Prerequisites
 
 - Python 3.14+
-- [Poetry](https://python-poetry.org/) for dependency management
+- [uv](https://docs.astral.sh/uv/) for dependency management
 - Node.js 22+ and [pnpm](https://pnpm.io/) (for web UI)
 
 ## Quick Start
@@ -79,17 +79,17 @@ What it does, who it's for, and what problem it solves. Fill this in from your [
 # Clone and install
 git clone https://github.com/you/my-project.git
 cd my-project
-poetry install
+uv sync
 
 # Set up environment
 cp .env.example .env
 # Edit .env with your values
 
 # Run database migrations (if applicable)
-poetry run alembic upgrade head
+uv run alembic upgrade head
 
 # Start the API server
-poetry run uvicorn src.interface.api.app:app --reload --port 8000  # Pick a unique port per project
+uv run uvicorn src.interface.api.app:app --reload --port 8000  # Pick a unique port per project
 
 # Start the frontend (separate terminal)
 pnpm --prefix web install
@@ -100,13 +100,13 @@ pnpm --prefix web dev
 
 ```bash
 # Tests
-poetry run pytest                     # Fast test suite
+uv run pytest                     # Fast test suite
 pnpm --prefix web test                # Frontend tests
 
 # Code quality
-poetry run ruff check . --fix         # Lint + autofix
-poetry run ruff format .              # Format
-poetry run basedpyright src/          # Type check
+uv run ruff check . --fix         # Lint + autofix
+uv run ruff format .              # Format
+uv run basedpyright src/          # Type check
 pnpm --prefix web check              # Frontend lint
 ```
 

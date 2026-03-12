@@ -70,19 +70,19 @@ Set up the backlog before building anything. Use it to plan all remaining guide 
 
 ```bash
 # -- During Development (targeted) -------------------------
-poetry run pytest tests/path/to/test_file.py -x  # Run affected test file
-poetry run pytest --lf                            # Rerun failed tests only
+uv run pytest tests/path/to/test_file.py -x  # Run affected test file
+uv run pytest --lf                            # Rerun failed tests only
 pnpm --prefix web test src/path/Component.test.tsx  # Single frontend test
 
 # -- Before Committing (full fast suite) --------------------
-poetry run pytest                           # All fast tests
+uv run pytest                           # All fast tests
 pnpm --prefix web test                      # All frontend tests
-poetry run ruff check . --fix               # Lint + autofix
-poetry run ruff format .                    # Format
+uv run ruff check . --fix               # Lint + autofix
+uv run ruff format .                    # Format
 
 # -- Full Verification (version bump / on request) ---------
-poetry run pytest -m ""                     # All tests (including slow)
-poetry run basedpyright src/                # Type check
+uv run pytest -m ""                     # All tests (including slow)
+uv run basedpyright src/                # Type check
 pnpm --prefix web check && pnpm --prefix web build  # Frontend quality gates
 
 # -- Frontend -----------------------------------------------
