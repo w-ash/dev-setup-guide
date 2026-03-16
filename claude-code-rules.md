@@ -119,42 +119,101 @@ Or do it manually:
 
 ## agents/ — Specialist Subagents
 
-Agents are read-only specialists that Claude invokes for deep analysis. They recommend — the main agent implements. Start with two essential agents.
+Agents are markdown files in `.claude/agents/` that define specialist subagents. Claude invokes them for deep analysis — they recommend, the main agent implements. Each agent runs in its own context window with its own tool restrictions.
 
-**Agent metadata format** (YAML frontmatter):
+### Frontmatter Fields
+
 ```markdown
 ---
 name: architecture-guardian
-description: Use this agent when you need architectural review for Clean Architecture compliance
+description: Use when you need architectural review for Clean Architecture compliance
 model: sonnet
-allowed_tools: ["Read", "Glob", "Grep"]
+color: "#a855f7"
+tools: Read, Glob, Grep
+permissionMode: plan
+maxTurns: 8
+skills: subagent-guide
 ---
+[Agent system prompt — role, competencies, response pattern, success criteria]
 ```
 
-**`agents/architecture-guardian.md`** — validates layer dependencies, repository patterns, transaction boundaries. Outputs: Approved / Approved with suggestions / Rejected with violations.
+All available fields:
 
-**`agents/test-pyramid-architect.md`** — designs test strategies, identifies correct test level per layer, recommends fixture patterns. Targets: 60% unit / 35% integration / 5% E2E.
+| Field | Required | Purpose |
+|-------|----------|---------|
+| `name` | Yes | Unique identifier (lowercase, hyphens) |
+| `description` | Yes | When Claude should delegate — be specific so Claude knows when to invoke |
+| `model` | No | `sonnet`, `opus`, `haiku`, or `inherit` (default: inherit from parent) |
+| `color` | No | Status line color — hex string (e.g., `"#a855f7"`) |
+| `tools` | No | Tool allowlist, comma-separated. Omit to inherit all tools |
+| `disallowedTools` | No | Tool denylist (alternative to `tools`) |
+| `maxTurns` | No | Upper bound on agent turns before stopping |
+| `skills` | No | Skills to preload into agent context, comma-separated |
+| `permissionMode` | No | `default`, `plan` (read-only), `acceptEdits`, `bypassPermissions` |
+| `memory` | No | Persistent cross-session memory: `user`, `project`, or `local` |
+
+### Key Fields Explained
+
+**`tools`** — restricts what the agent can use. Read-only analysis agents should list `Read, Glob, Grep` only. Agents that run tests or CLI commands also need `Bash`. Agents that modify files need `Edit` or `Write` (rare for advisory agents).
+
+**`maxTurns`** — prevents runaway agents. Set generous upper bounds: 8-10 for analysis agents, 12-15 for agents that run commands. Costs nothing during normal operation — the guardrail only fires when an agent loops.
+
+**`skills`** — critical for agent effectiveness. Subagents do NOT inherit skills from the parent conversation — they start with a blank slate. Without `skills:`, an ORM specialist has to search the codebase for the database schema every invocation. With `skills: database-schema`, it starts with the schema already in context.
+
+**`permissionMode: plan`** — system-enforced read-only. The agent cannot write files even if it tries. Ideal for analysis-only agents like architecture reviewers. Belt-and-suspenders with a restricted `tools` list.
+
+**`memory: project`** — creates a persistent directory at `.claude/agent-memory/<name>/` that survives across conversations. The agent can write notes about patterns it discovers. Use for agents that learn project-specific knowledge over time (e.g., an ORM optimizer remembering which queries had N+1 issues). Creates a version-controllable `.claude/agent-memory/` directory. Auto-enables Read/Write/Edit for the memory directory only.
+
+### Starter Agents
+
+**`agents/architecture-guardian.md`** — validates layer dependencies, repository patterns, transaction boundaries. Read-only (`tools: Read, Glob, Grep`, `permissionMode: plan`). Outputs: Approved / Approved with suggestions / Rejected with violations.
+
+**`agents/test-pyramid-architect.md`** — designs test strategies, identifies correct test level per layer, recommends fixture patterns. Needs Bash to run tests (`tools: Read, Glob, Grep, Bash`). Targets: 60% unit / 35% integration / 5% E2E.
 
 **When to add more agents**: when you find yourself repeatedly giving the same specialized guidance (e.g., ORM optimization, frontend testing patterns, log analysis).
+
+### Agent Prompt Structure
+
+Agent prompts are the markdown body after the frontmatter. Aim for 100-300 lines:
+
+1. **Role + scope** (~5 lines) — what the agent is, what it's an expert in
+2. **Core competencies** (~30-80 lines) — codebase-specific knowledge, patterns to enforce
+3. **Tool restrictions + why** (~10 lines) — what commands are allowed, what's off-limits
+4. **Response pattern** (~10 lines) — analyze → recommend → explain rationale → anticipate issues
+5. **Success criteria** (~10 lines) — what a good recommendation looks like
+
+### DO / DON'T
+
+- **DO** restrict tools to the minimum needed — less is safer and more focused
+- **DO** set `maxTurns` on every agent — even generous limits prevent runaway cost
+- **DO** preload skills the agent always needs — eliminates redundant file searches every session
+- **DO** use `permissionMode: plan` for read-only analysis agents
+- **DO** include `<example>` tags in `description` so Claude knows exactly when to delegate
+- **DON'T** give agents Write/Edit tools unless they genuinely modify files (most advisory agents don't)
+- **DON'T** add `memory` to every agent — only agents that accumulate project-specific patterns across sessions benefit (e.g., ORM optimizer). Analysis agents that derive advice from rules (architecture guardian) or from code they read fresh (test architect) don't need memory
+- **DON'T** exceed 400 lines in agent prompts — be specific but not verbose
+- **DON'T** create agents for one-off tasks — use the built-in Agent tool with a prompt instead
 
 ---
 
 ## skills/ — Reference Documents
 
-Skills are embedded reference documents. Two types:
+Skills are markdown files in `.claude/skills/<name>/SKILL.md` that serve as embedded reference documents. They're the primary way to give agents (and the main conversation) domain knowledge.
 
-**Non-invocable** (background context, loaded automatically when relevant):
+### Two Types
+
+**Non-invocable** (background context, loaded when relevant):
 ```markdown
 ---
-name: api-contracts
-description: REST API endpoint reference — routes, schemas, error codes
+name: database-schema
+description: Database table definitions, relationships, indexes, and query patterns
 user-invocable: false
 ---
-# API Contracts
-[Condensed reference content]
+# Database Schema
+[Condensed reference content — tables, columns, relationships]
 ```
 
-**Invocable** (step-by-step workflows triggered by users):
+**Invocable** (step-by-step workflows triggered by `/skill-name`):
 ```markdown
 ---
 name: new-module
@@ -165,4 +224,26 @@ description: Step-by-step guide for adding a new module to the project
 ## Step 2: Define repository protocol...
 ```
 
-Use skills for: API contract references, design system tokens, database schema docs, repeatable multi-step workflows.
+### Skills + Agents Integration
+
+The `skills:` field in agent frontmatter preloads skill content into the agent's context at startup. This is the primary way to give agents domain knowledge:
+
+```markdown
+# In .claude/agents/orm-optimizer.md
+---
+skills: database-schema, api-contracts
+---
+```
+
+The agent starts every session with the database schema and API contracts already loaded — no file searching needed.
+
+**Skill naming**: the `name:` field in skill frontmatter is the identifier used in agent `skills:` fields. Keep names short and descriptive.
+
+### When to Create a Skill vs a Rule
+
+| Use... | When... |
+|--------|---------|
+| **Rule** (`.claude/rules/`) | Guidance scoped to file paths — auto-loads when editing matching files |
+| **Skill** (`.claude/skills/`) | Reference material not tied to file paths — loaded explicitly by agents or users |
+
+Use skills for: API contract references, database schema docs, design system tokens, repeatable multi-step workflows, and any reference material agents need.
