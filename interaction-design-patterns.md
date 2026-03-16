@@ -101,6 +101,82 @@ Users naturally scan the top layer. They look deeper only when they need detail.
 
 ---
 
+## Segmented Controls & Mode Toggles
+
+A horizontal group of 2–5 mutually exclusive options that switch a view mode. Not tabs (which navigate between pages), not radio buttons in a form (which collect data for submission). Examples: Monthly/YTD view, Grid/List layout, Add/Remove mode.
+
+### The AI-Slop Version vs. the Purposeful Version
+
+The generic implementation: two buttons with conditional CSS classes that swap `bg-muted` ↔ `bg-accent`. The result looks like "two separate buttons" — no visual connection between the options, no motion to confirm the state change.
+
+The purposeful implementation (Mantine, Radix Themes, Apple, Wise — standard across major design systems since 2025): a **sliding indicator** that smoothly transitions between options. The indicator is an absolutely positioned background element that moves via CSS `transform` + `transition`. This is the single clearest signal that someone built a real component vs. styled some buttons.
+
+### Implementation Pattern
+
+No animation library needed — pure CSS transitions + refs.
+
+**Structure:**
+```tsx
+<div role="radiogroup" className="relative flex rounded-lg bg-muted/50 p-0.5">
+  {/* Sliding indicator — positioned behind the active option */}
+  <div
+    aria-hidden
+    className="absolute top-0.5 bottom-0.5 rounded-lg bg-card shadow-sm
+               transition-[transform,width] duration-200 ease-out"
+    style={{ transform: `translateX(${left}px)`, width, left: 0 }}
+  />
+
+  {/* Options — native radio inputs for free keyboard nav */}
+  {options.map(option => (
+    <label key={option.value} ref={/* track for measurement */}
+      className="relative z-10 flex-1 text-center cursor-pointer ...">
+      <input type="radio" name={groupName} className="sr-only"
+        checked={option.value === value}
+        onChange={() => onChange(option.value)} />
+      {option.label}
+    </label>
+  ))}
+</div>
+```
+
+**How the sliding indicator works:**
+1. `useRef` on each label element + the container
+2. `useEffect` measures the active label's `offsetLeft` and `offsetWidth`
+3. State stores `{ left, width }` for the indicator div
+4. CSS `transition: transform 200ms ease-out` handles the animation
+5. `ResizeObserver` re-measures on container resize (guard with `typeof ResizeObserver !== "undefined"` for SSR/test environments)
+
+**Visual tokens:**
+- Track: subtle recessed background (e.g., `bg-muted/50`) with small padding
+- Indicator: card-colored background + subtle shadow (`bg-card shadow-sm`)
+- Active text: full contrast. Inactive text: muted, strengthens on hover
+- Text color transitions via `transition-colors duration-150` (the indicator handles the background)
+
+**Variants:** `rounded-lg` for top-level page controls, `rounded-full` for inline/compact controls within form rows. Two size tiers (compact for popovers, standard for page headers) via padding + font-size adjustments.
+
+### Accessibility (WAI-ARIA Radio Group Pattern)
+
+Native `<input type="radio">` elements with a shared `name` attribute give you the correct semantics for free:
+- `aria-checked` managed by the browser
+- Arrow keys navigate between options (the browser handles this natively for radio groups)
+- Tab enters/leaves the group, arrow keys move within
+- Screen readers announce the group and each option's state
+
+Focus ring: use `has-focus-visible:ring-2` on the `<label>` (Tailwind's `has-` variant targets the label when its child input receives focus).
+
+Container: `role="radiogroup"` for explicit grouping semantics.
+
+### When NOT to Use
+
+| Situation | Use instead |
+|---|---|
+| More than 5 options | Select / dropdown |
+| Independent on/off toggles | Switch components |
+| Navigation between pages | Tabs or nav links |
+| Action pairs (Accept/Reject) that aren't mutual modes | Regular buttons |
+
+---
+
 ## Confirmation & Destructive Actions
 
 Not every action needs a confirmation dialog. Overusing them trains users to click "OK" reflexively — which means the one time it matters, they'll click through without reading.
@@ -426,3 +502,10 @@ This ensures every AI-generated component follows your interaction patterns, not
 - [ ] Primary actions prominent, secondary actions muted but visible?
 - [ ] Same action uses same label + icon across all pages?
 - [ ] Direction labels use arrows, not push/pull jargon?
+
+### Cross-Page Consistency
+- [ ] Same interaction on different pages uses the same shared component?
+- [ ] No hand-rolled inline class strings duplicating a shared constant?
+- [ ] Mode toggles use a shared SegmentedControl (not ad-hoc button groups)?
+- [ ] Top-level cards all use the same radius and shadow?
+- [ ] New UI checks for existing primitives before creating inline styles?

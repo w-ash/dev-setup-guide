@@ -121,6 +121,33 @@ These are options, not requirements. Pick what fits your identity — the point 
 
 ---
 
+## Component Primitives as Design Enforcement
+
+Design identity docs describe *values* — warm neutrals, rounded corners, generous spacing. Values get interpreted differently by each page. A "rounded corner" directive produces `rounded-md` on one page, `rounded-lg` on another, and `rounded-xl` on a third. A "consistent button styling" directive produces three hand-rolled inline class strings that look almost — but not quite — the same. Over a few months this accumulates into a fractured UX where the same interaction *concept* looks different across pages.
+
+**The fix: enforce consistency through code, not code review.**
+
+Extract shared primitives early — not after drift, but as part of initial design system setup. Then name them in your `.claude/rules/` file so AI tools reach for the component instead of re-deriving styling from principles.
+
+### What to extract
+
+These patterns appear across multiple pages and must look identical everywhere:
+
+| Primitive | Why it drifts | What to extract |
+|---|---|---|
+| **Buttons** | Each page hand-rolls `rounded-lg border bg-card px-4 py-2 ...` | A `<Button>` component with variant + size props |
+| **Input styles** | Inline class strings diverge on padding, radius, focus ring | Composable class constants (`baseInputClass`, `selectInputClass`) |
+| **Cards** | Different radius, shadow, padding across pages | Documented class string in the rules file (e.g., `rounded-xl border bg-card p-6 shadow-sm`) |
+| **Mode toggles** | Three implementations for the same 2-option switcher | A `<SegmentedControl>` with sliding indicator (see [Interaction Design Patterns](interaction-design-patterns.md#segmented-controls--mode-toggles)) |
+| **Page states** | Loading/error/empty reinvented per page | `<PageLoading>`, `<PageError>`, `<PageEmpty>` components |
+| **Page header** | h1 + icon + flex layout hand-rolled on each page | A `<PageHeader>` component |
+
+### The rule
+
+If the same visual pattern appears on two pages, it must come from a shared component or constant — never from two inline class strings that happen to match today. Today's matching strings are tomorrow's subtle inconsistencies.
+
+---
+
 ## Encoding Your Identity in `.claude/rules/`
 
 Your visual identity should live in a `.claude/rules/web-design-system.md` file scoped to component and page paths. This ensures Claude enforces your specific aesthetic every time it writes UI code.
@@ -159,6 +186,13 @@ A power tool for metadata enthusiasts. Precise, data-rich, intentionally crafted
 - Uniform card layouts, uniform spacing
 - animate-pulse skeletons (use shimmer gradient)
 - Native form controls in dark theme
+
+## Component Primitives (always use these)
+- All buttons: `<Button>` component (variants: primary/secondary/destructive, sizes: default/sm)
+- Text inputs: compose from `baseInputClass` constant — never hand-roll inline
+- Mode toggles: `<SegmentedControl>` with sliding indicator
+- Page states: `<PageLoading>`, `<PageError>`, `<PageEmpty>`
+- Top-level cards: `rounded-xl border bg-surface-elevated p-6 shadow-sm`
 ```
 
 A different project would make entirely different choices. A children's education app might specify bold primary colors, rounded playful shapes, and generous whitespace. A fintech dashboard might specify tight data density, monochrome with green/red accents, and no decorative elements. **The structure is the same; the choices are yours.**
