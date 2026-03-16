@@ -1,7 +1,7 @@
 # React API Client & Testing
 
 > **Scope**: Orval code generation, custom fetch wrapper, QueryClient configuration, and Vitest + MSW test setup
-> **Prerequisites**: [React Tooling](react-tooling.md), [FastAPI Backend](fastapi-backend.md) (for OpenAPI spec)
+> **Prerequisites**: [React Tooling](react-tooling.md), [Backend Patterns](backend-patterns.md) (for OpenAPI spec)
 > **Deliverables**: Orval generating hooks from OpenAPI, `customFetch` + `ApiError` working, Vitest + MSW test harness running
 > **Estimated effort**: M
 
@@ -124,6 +124,8 @@ Only retries on 5xx server errors (never on 4xx client errors). 30-second stale 
 
 ## Vitest Configuration
 
+Vitest 4.x notes: `coverage.include` must be defined explicitly, `workspace` is renamed to `projects`, and pool options are top-level (`maxWorkers` replaces `maxThreads`/`maxForks`).
+
 ```typescript
 // web/vitest.config.ts
 import { defineConfig, mergeConfig } from "vitest/config";
@@ -138,6 +140,9 @@ export default mergeConfig(
       setupFiles: ["./src/test/setup.ts"],
       include: ["src/**/*.test.{ts,tsx}"],
       exclude: ["src/api/generated/**"],
+      coverage: {
+        include: ["src/**"],  // Required in Vitest 4.x
+      },
     },
   }),
 );

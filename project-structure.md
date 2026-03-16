@@ -44,7 +44,7 @@ These reference other guides — work through them in phase order:
 - [ ] Scaffold frontend → `pnpm create vite web -- --template react-ts` → [React Tooling](react-tooling.md)
 - [ ] Frontend tooling (biome, tsconfig, vite) → [React Tooling](react-tooling.md)
 - [ ] API client + test infra → [React API & Testing](react-api-testing.md)
-- [ ] Database + Alembic init (if applicable) → `alembic init alembic` → [Database Patterns](database-patterns.md)
+- [ ] Database + Alembic init (if applicable) → `alembic init alembic` → [Backend Patterns](backend-patterns.md)
 - [ ] Health check endpoint — verify the full stack works end to end
 - [ ] Run all quality gates — confirm a clean baseline
 
@@ -237,9 +237,9 @@ Document every environment variable your project needs. This file is **committed
 DATABASE_URL=sqlite+aiosqlite:///data/app.db
 
 # External API keys (get from service dashboards)
-SPOTIFY_CLIENT_ID=
-SPOTIFY_CLIENT_SECRET=
-LASTFM_API_KEY=
+SERVICE_A_API_KEY=
+SERVICE_A_SECRET=
+SERVICE_B_API_KEY=
 
 # Optional (defaults shown)
 LOG_LEVEL=INFO

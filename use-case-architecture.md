@@ -1,11 +1,11 @@
 # Use Case Architecture
 
 > **Scope**: Use case file anatomy, transaction ownership, repository access, external service protocols, audit checklist
-> **Prerequisites**: [Domain Modeling](domain-modeling.md), [FastAPI Backend](fastapi-backend.md), [Database Patterns](database-patterns.md)
+> **Prerequisites**: [Domain Modeling](domain-modeling.md)
 > **Deliverables**: Use cases following the Command/Result/Execute contract, passing the audit checklist
 > **Estimated effort**: M
 
-How to structure use cases so they're testable, composable, and auditable. The runner and route handler patterns are in [FastAPI Backend](fastapi-backend.md) — this guide covers what happens *inside* the use case. For Command/Result data modeling patterns (attrs, validators, sentinel for partial updates), see [Domain Modeling](domain-modeling.md).
+How to structure use cases so they're testable, composable, and auditable. The runner and route handler patterns are in [Backend Patterns](backend-patterns.md) — this guide covers what happens *inside* the use case. For Command/Result data modeling patterns (attrs, validators, sentinel for partial updates), see [Domain Modeling](domain-modeling.md).
 
 ---
 
@@ -97,7 +97,7 @@ Rules:
 - **Read-only use cases skip `commit()`** — still use `async with uow:` for session scoping
 - **Exceptions auto-rollback** — the context manager handles cleanup
 
-For UoW implementation details (auto-commit, session lifecycle, `execute_use_case()` bridge), see [Database Patterns](database-patterns.md).
+For UoW implementation details (auto-commit, session lifecycle, `execute_use_case()` bridge), see [Backend Patterns](backend-patterns.md).
 
 ### Read-Only Pattern (Previews, Lists, Gets)
 
@@ -301,7 +301,7 @@ Use this to verify existing use cases or review new ones.
 ### Interface integration
 - [ ] Route handlers are 5–10 lines of parse/build/execute/serialize
 - [ ] Both CLI and API use the same use case — no duplicated logic
-- [ ] All calls go through `execute_use_case()` runner
+- [ ] All calls go through `execute_use_case()` runner (see [Backend Patterns](backend-patterns.md))
 
 ### Testing
 - [ ] Test file at `tests/unit/application/use_cases/test_<name>.py`

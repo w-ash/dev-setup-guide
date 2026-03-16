@@ -2,7 +2,7 @@
 
 > **Scope**: Version-scoped roadmap files, epic/story format, effort estimation, and planning lifecycle
 > **Prerequisites**: [Claude Code Setup](claude-code-setup.md)
-> **Deliverables**: `docs/backlog/README.md` (master status), version files (`v0.X.x.md`), `unscheduled.md`
+> **Deliverables**: `docs/backlog/README.md` (master status), version files (`v0.X.x.md`), `unscheduled.md`, `.claude/rules/backlog-format.md`
 > **Estimated effort**: S
 
 ---
@@ -91,10 +91,10 @@ For strategic overview, see the [planning overview](README.md).
 
 - [ ] **[Story Title]**
     - Effort: [XS|S|M|L|XL|XXL]
-    - Status: Not Started
     - What: [One-sentence feature description]
     - Why: [Business/architectural justification]
     - Dependencies: [List of prerequisite stories/versions]
+    - Status: Not Started
     - Notes:
         - [Detailed implementation guidance]
         - [Database schema changes, API routes, component structure]
@@ -102,9 +102,10 @@ For strategic overview, see the [planning overview](README.md).
 
 - [ ] **[Story Title]**
     - Effort: S
-    - Status: Not Started
     - What: ...
     - Why: ...
+    - Dependencies: None
+    - Status: Not Started
 
 ---
 
@@ -122,12 +123,12 @@ For strategic overview, see the [planning overview](README.md).
 When a story ships, check the box and add a completion date:
 
 ```markdown
-- [x] **Import Listening History**
+- [x] **Import External Data**
     - Effort: M
-    - Status: Completed (2026-02-10)
-    - What: Import play history from Service A API
+    - What: Import data from Service A API
     - Why: Foundation for all recommendation features
     - Dependencies: v0.1.0 (data model)
+    - Status: Completed (2026-02-10)
     - Notes:
         - Paginated API fetch with rate limiting
         - Batch upsert into tracks table
@@ -218,9 +219,9 @@ unscheduled.md  →  backlog/v0.X.x.md  →  completed/v0.X.x.md
 Ideas and features without version assignment. Move to a version file when ready to commit.
 
 ## Data & Enrichment
-- Genre tagging from MusicBrainz
-- BPM detection via audio analysis
-- Lyrics integration
+- Third-party metadata enrichment
+- Automated categorization
+- Full-text search integration
 
 ## UI Improvements
 - Dark/light theme toggle
@@ -228,9 +229,9 @@ Ideas and features without version assignment. Move to a version file when ready
 - Mobile-responsive layout
 
 ## Integrations
-- Apple Music connector
-- YouTube Music connector
-- Discogs collection import
+- Service C connector
+- Service D connector
+- Legacy data import (CSV/JSON)
 ```
 
 Keep it simple — bullets with enough context to remember the idea. Full story attributes come when it moves to a version file.
@@ -257,10 +258,8 @@ From the [Getting Started guide](../../docs/dev-setup-guide/README.md).
     - What: Create monorepo directory layout with Clean Architecture layers
 
 #### Language & Tooling Epic
-- [ ] **Python Tooling** — Effort: S — [guide](../../docs/dev-setup-guide/python-tooling.md)
-    - What: Configure uv, Ruff, BasedPyright, pytest, pre-commit
-- [ ] **Python 3.14+ Syntax** — Effort: S — [guide](../../docs/dev-setup-guide/python-syntax.md)
-    - What: Review modern syntax patterns, add to CLAUDE.md
+- [ ] **Python Tooling & Syntax** — Effort: S — [guide](../../docs/dev-setup-guide/python-tooling.md)
+    - What: Configure uv, Ruff, BasedPyright, pytest, pre-commit; review Python 3.14+ syntax patterns
 - [ ] **Project Configuration** — Effort: S — [guide](../../docs/dev-setup-guide/project-configuration.md)
     - What: Set up typed settings, constants module, structured logging
 
@@ -269,30 +268,30 @@ From the [Getting Started guide](../../docs/dev-setup-guide/README.md).
 ### v0.0.2: Stack Setup
 
 #### Backend Epic
-- [ ] **FastAPI Backend** — Effort: M — [guide](../../docs/dev-setup-guide/fastapi-backend.md)
-    - What: Use case runner, thin routes, error envelope, OpenAPI spec
 - [ ] **Domain Modeling** — Effort: M — [guide](../../docs/dev-setup-guide/domain-modeling.md)
     - What: Immutable entities, Command/Result pattern, structured failures
-- [ ] **Database Patterns** — Effort: M — [guide](../../docs/dev-setup-guide/database-patterns.md)
-    - What: Batch-first repos, Unit of Work, eager loading
-    - Notes: Skip if project has no database
+- [ ] **Backend Patterns** — Effort: M — [guide](../../docs/dev-setup-guide/backend-patterns.md)
+    - What: Use case runner, thin routes, error envelope, repositories, Unit of Work
+    - Notes: Database sections optional if project has no DB
 - [ ] **External API Resilience** — Effort: M — [guide](../../docs/dev-setup-guide/external-api-resilience.md)
     - What: Error classifier, retry policies, HTTP client factories
     - Notes: Skip if project makes no external API calls
 
 #### Frontend Epic
 - [ ] **React Tooling** — Effort: S — [guide](../../docs/dev-setup-guide/react-tooling.md)
-    - What: Vite, TypeScript strict mode, Biome
+    - What: Vite 8, TypeScript strict mode, Biome
 - [ ] **Design Identity** — Effort: M — [guide](../../docs/dev-setup-guide/react-design-identity.md)
     - What: Visual identity, anti-AI-slop principles, design system rules
 - [ ] **Frontend Architecture** — Effort: M — [guide](../../docs/dev-setup-guide/react-frontend-architecture.md)
-    - What: IA, page inventory, app shell, navigation, theme implementation, user state, user flows, UI audit checklist
+    - What: IA, page inventory, app shell, navigation, theme implementation, user state
+- [ ] **Interaction Design** — Effort: M — [guide](../../docs/dev-setup-guide/interaction-design-patterns.md)
+    - What: Progressive disclosure, confirmation flows, state handling, UI audit checklist
 - [ ] **React API & Testing** — Effort: M — [guide](../../docs/dev-setup-guide/react-api-testing.md)
     - What: Orval codegen, custom fetch, QueryClient, Vitest + MSW
 
 #### CLI Epic
-- [ ] **CLI with Typer** — Effort: M — [guide](../../docs/dev-setup-guide/cli-typer.md)
-- [ ] **CLI Rich Patterns** — Effort: S — [guide](../../docs/dev-setup-guide/cli-rich-patterns.md)
+- [ ] **CLI Patterns** — Effort: M — [guide](../../docs/dev-setup-guide/cli-patterns.md)
+    - What: Typer app structure, async bridge, Rich menus, progress displays
 
 ---
 
@@ -305,3 +304,79 @@ From the [Getting Started guide](../../docs/dev-setup-guide/README.md).
 ```
 
 **Adapt to your project**: Skip epics that don't apply (no CLI? drop the CLI epic). Skip individual stories (no database? drop Database Patterns). Version priorities should reflect your product goals from [Product Context](product-context.md).
+
+---
+
+## Encoding in `.claude/rules/`
+
+Create `.claude/rules/backlog-format.md` so Claude Code enforces consistent backlog structure across all projects using this guide:
+
+```markdown
+---
+paths:
+  - "docs/backlog/**"
+  - "docs/completed/**"
+---
+# Backlog Format Rules
+
+## Directory Structure
+- `docs/backlog/README.md` — master roadmap: version matrix, infrastructure readiness, tech decisions
+- `docs/backlog/v0.X.x.md` — one file per minor version series (may contain multiple patch versions)
+- `docs/backlog/unscheduled.md` — ideas without version assignment
+- `docs/completed/` — archived version files + index after all stories ship
+
+## Master README Format
+- **Current Version** and **Current Initiative** at the top
+- Version matrix table: Version | Goal | Status | Details (with link to section)
+- Status indicators: ✅ Completed | 🔨 In Progress | 🔜 Not Started
+- Infrastructure Readiness Matrix showing capabilities across versions
+- Technology Decision Records for key architecture choices
+- Reference section: effort estimate definitions + status options
+
+## Version File Format
+Header: `# v0.X.x: [Initiative Name]`
+Sub-versions: `### v0.X.Y: [Feature Milestone]`
+Each sub-version includes: **Goal**, **Context**, **What this unlocks**, **Key tech choices**
+
+### Story Format (mandatory fields, this exact order)
+- [ ] **Story Title**
+    - Effort: XS|S|M|L|XL|XXL
+    - What: One-sentence description
+    - Why: Business/architectural justification
+    - Dependencies: version refs or story titles (None if none)
+    - Status: Not Started | In Progress | Blocked | Completed (YYYY-MM-DD)
+    - Notes:
+        - Implementation guidance, schema changes, test expectations
+        - Sub-bullets for detailed technical notes
+
+### Epic Grouping
+`#### [Epic Name] Epic` — groups related stories. Epics have no status or effort of their own.
+
+## Unscheduled Format
+Category sections (`## Category Name`), each item: `**Title** (effort)` with description.
+Detailed planning notes are OK for items with significant research.
+
+## Lifecycle Operations
+
+### Completing a story
+1. Check the box: `- [x]`
+2. Update Status to `Completed (YYYY-MM-DD)` with actual date
+3. Update `docs/backlog/README.md` version matrix status
+
+### Completing a version file
+1. Move from `docs/backlog/` to `docs/completed/`
+2. Update `docs/completed/README.md` index
+3. Update `docs/backlog/README.md` matrix to ✅ Completed
+
+## Effort Sizing (relative, NEVER time-based)
+- XS: trivial, isolated | S: small, well-understood, 1-2 areas
+- M: cross-module, small unknowns | L: architectural impact, >=3 subsystems
+- XL: high unknowns, cross-team | XXL: high risk, break down further
+
+## Conventions
+- Always convert relative dates to absolute (e.g., "Thursday" → "2026-03-20")
+- New ideas → unscheduled.md first, version file when committed
+- Each version delivers a vertical slice — backend + frontend together — so every increment is testable end-to-end
+```
+
+This rule ensures every project using this guide produces identically structured backlog files — making cross-project planning, status checks, and agent-driven updates consistent.

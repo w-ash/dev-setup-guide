@@ -5,20 +5,24 @@
 > **Deliverables**: `web/vite.config.ts`, `web/tsconfig.json`, `web/biome.json` configured and working
 > **Estimated effort**: S
 
+Requires **Node.js 20.19+** or **22.12+**.
+
 ---
 
 ## Vite Configuration
 
+Vite 8 uses **Rolldown** (Rust-based) as the unified bundler for both dev and production, replacing esbuild + Rollup.
+
 ```typescript
 // web/vite.config.ts
 import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react";  // v6: uses Oxc instead of Babel
 import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    alias: { "@": "/src" },
+    tsconfigPaths: true,  // Reads paths from tsconfig.json — no manual alias needed
   },
   server: {
     open: true,
@@ -35,7 +39,7 @@ export default defineConfig({
 });
 ```
 
-Key features: Tailwind v4 plugin, `@/` import alias, and `/api` proxy to FastAPI during development. Choose unique ports per project so multiple projects can run simultaneously — update both the Vite proxy target and the FastAPI CORS origin to match.
+Key features: Tailwind v4 plugin, `@/` alias via tsconfig paths (Vite 8 reads `tsconfig.json` natively), and `/api` proxy to FastAPI during development. Choose unique ports per project so multiple projects can run simultaneously — update both the Vite proxy target and the FastAPI CORS origin to match.
 
 ### Tailwind v4 Setup
 

@@ -1,17 +1,19 @@
 # Claude Code Setup
 
-> **Scope**: CLAUDE.md authorship, PostToolUse hooks for auto-formatting, and permission controls
+> **Scope**: CLAUDE.md authorship, hooks for auto-formatting, permission controls
 > **Prerequisites**: None — do this first
 > **Deliverables**: `CLAUDE.md` written, `.claude/settings.json` with hooks, `.claude/settings.local.json` with permissions
 > **Estimated effort**: M
 
 Everything you need to configure Claude Code for maximum effectiveness. Path-scoped rules, agents, and skills are covered in [Claude Code Rules](claude-code-rules.md).
 
+**Official docs**: [code.claude.com/docs/en/](https://code.claude.com/docs/en/)
+
 ---
 
 ## CLAUDE.md — The Project Brain
 
-`CLAUDE.md` is the single most important file for Claude Code. It's loaded as the system prompt for every conversation, so it directly determines code quality.
+`CLAUDE.md` is the single most important file for Claude Code. It's loaded as a user message after the system prompt for every conversation, so it directly shapes code quality and adherence to project conventions.
 
 ### Recommended Sections
 
@@ -21,7 +23,7 @@ Fill in the product sections from your [Product Context](product-context.md) wor
 # Project Name
 
 ## What [Project] Does
-**[One-line pitch — what it is in ≤10 words]**
+**[One-line pitch — what it is in <=10 words]**
 
 ### User Problem
 - [Pain point 1 — what users can't do or what's painful]
@@ -42,7 +44,7 @@ Fill in the product sections from your [Product Context](product-context.md) wor
 - [Your project-specific principles]
 
 ## Architecture
-**Dependency Flow**: Interface → Application → Domain ← Infrastructure
+**Dependency Flow**: Interface -> Application -> Domain <- Infrastructure
 
 [Layer descriptions with directory mappings]
 
@@ -70,20 +72,41 @@ Fill in the product sections from your [Product Context](product-context.md) wor
 [Links to deeper docs]
 ```
 
-### Writing Style Tips
+### Keeping CLAUDE.md Effective
 
 - **Use imperative language**: "YOU MUST FOLLOW" — Claude treats CLAUDE.md as authoritative instructions
-- **Keep it under 300 lines** — lines beyond that risk context truncation; link to deeper docs
+- **Keep it under 200 lines** — longer files consume more context and reduce adherence. Link to deeper docs instead
+- **Use `@path` imports** to reference detailed docs without bloating CLAUDE.md: `@docs/architecture/layers-and-patterns.md` inlines that file's content. Supports relative, absolute, and `@~/` home-dir paths, up to 5 hops of recursive imports
 - **Include a Self-Check pattern** — a checklist Claude runs after every implementation to catch its own gaps
 - **Be specific about commands** — include the exact `uv run` prefix, flag combinations, etc.
+
+### Where Content Comes From
+
+Each guide in this project produces concrete deliverables — CLAUDE.md sections, `.claude/rules/` files, tool configs. Use the guides as source material, then bake the patterns into your project's own config. Claude Code reads your `CLAUDE.md` and `.claude/` directory every session; it never reads `docs/dev-setup-guide/`.
 
 ---
 
 ## .claude/ Directory Configuration
 
-### settings.json — PostToolUse Hooks
+### settings.json — Hooks
 
-Hooks run automatically after Claude uses the Edit or Write tools. This ensures every file Claude touches is instantly formatted and linted.
+Hooks run automatically in response to Claude Code events. The most common use is auto-formatting after file edits.
+
+**Four handler types** are available:
+- `command` — run a shell command (most common)
+- `http` — POST to a URL
+- `prompt` — send to a Claude model for LLM-based evaluation
+- `agent` — spawn a subagent with tool access
+
+**Major hook events** (22 total — see official docs for the full list):
+- `PostToolUse` — after Claude uses a tool (most common for formatters)
+- `PreToolUse` — before tool execution (validation, guards)
+- `UserPromptSubmit` — before processing user input
+- `Notification` — when Claude sends a notification
+- `Stop` — when Claude finishes a response
+- `SessionStart` / `SessionEnd` — conversation lifecycle
+
+**Example** — auto-format on every file edit:
 
 ```json
 {
@@ -117,7 +140,6 @@ Hooks run automatically after Claude uses the Edit or Write tools. This ensures 
 - First hook: runs `ruff check --fix` on any Python file edit
 - Second hook: runs `biome check --write` on TypeScript/JavaScript edits (filtered by `grep`)
 - `exit 0` ensures hook failures never block Claude's workflow
-- `2>/dev/null` suppresses noise from files outside the tool's scope
 
 ### settings.local.json — Permissions Matrix
 
@@ -127,17 +149,17 @@ This file is **gitignored** — it's per-developer. It controls what Claude can 
 {
   "permissions": {
     "allow": [
-      "Bash(uv run pytest:*)",
-      "Bash(uv run ruff check:*)",
-      "Bash(uv run ruff format:*)",
-      "Bash(uv run basedpyright:*)",
-      "Bash(pnpm:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(ls:*)",
-      "Bash(find:*)",
-      "Bash(grep:*)",
+      "Bash(uv run pytest *)",
+      "Bash(uv run ruff check *)",
+      "Bash(uv run ruff format *)",
+      "Bash(uv run basedpyright *)",
+      "Bash(pnpm *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
       "WebSearch"
     ],
     "deny": []
@@ -146,3 +168,9 @@ This file is **gitignored** — it's per-developer. It controls what Claude can 
 ```
 
 **Principle**: allow read-only operations and dev tooling by default; require confirmation for destructive operations (git push, file deletion, etc.).
+
+**Note**: The legacy `:*` suffix syntax (e.g., `Bash(uv run pytest:*)`) is deprecated. Use a space before the wildcard: `Bash(uv run pytest *)`.
+
+### Plugins
+
+Claude Code supports distributable plugins that bundle skills, agents, hooks, MCP servers, and LSP servers. Enable them in `settings.json` via `enabledPlugins`. See the [official docs](https://code.claude.com/docs/en/) for available plugins and authoring your own.

@@ -229,16 +229,16 @@ Run only the tests for the code you changed. Stop on first failure to fix immedi
 
 ```bash
 # Backend: run the specific test file
-uv run pytest tests/unit/domain/test_matching.py -x
+uv run pytest tests/unit/domain/test_entities.py -x
 
 # Iterate on a single failing test
-uv run pytest tests/unit/domain/test_matching.py -x -k "test_exact_match"
+uv run pytest tests/unit/domain/test_entities.py -x -k "test_valid_creation"
 
 # Rerun only previously-failed tests
 uv run pytest --lf
 
 # Frontend: run the specific test file
-pnpm --prefix web test src/components/TrackCard.test.tsx
+pnpm --prefix web test src/components/ItemCard.test.tsx
 ```
 
 ### Before committing — full fast suite
@@ -266,19 +266,4 @@ pnpm --prefix web check && pnpm --prefix web build
 - Running `pnpm --prefix web build` to verify a component change — that's what `test` is for
 - Running slow/diagnostic tests during normal development
 
-### Claude Code CLAUDE.md template
-
-Add this to your CLAUDE.md Testing section so agents follow the policy:
-
-```markdown
-### When to Run What
-**During implementation** — targeted tests ONLY:
-- `uv run pytest tests/path/to/test_file.py -x`
-- `-k "test_name"` to iterate on a single failing test
-- `--lf` to rerun only previously-failed tests
-
-**Before committing** — full fast suite:
-- `uv run pytest` + `pnpm --prefix web test`
-
-**NEVER** run the full suite after every small edit.
-```
+Include these test execution rules in your CLAUDE.md Testing section — see [Claude Code Setup](claude-code-setup.md) for the full CLAUDE.md template.

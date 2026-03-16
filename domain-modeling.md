@@ -1,7 +1,7 @@
 # Domain Modeling
 
 > **Scope**: Immutable entities with attrs, Command/Result pattern, structured failures, self-describing metrics
-> **Prerequisites**: [Python 3.14+ Syntax](python-syntax.md), [Project Structure](project-structure.md)
+> **Prerequisites**: [Python Tooling](python-tooling.md), [Project Structure](project-structure.md)
 > **Deliverables**: Domain entities, use case commands/results, failure types, summary metrics
 > **Estimated effort**: M
 

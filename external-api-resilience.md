@@ -256,6 +256,8 @@ def make_weather_client() -> httpx.AsyncClient:
 
 ## SSE Progress Streaming
 
+FastAPI 0.135+ includes native SSE via `StreamingResponse` for simple cases. The pattern below uses `sse-starlette` for more complex queue-based routing with operation registries.
+
 For long-running operations triggered via API, return an **operation ID immediately** and stream progress via Server-Sent Events.
 
 ### Pattern: Pre-Assigned Operation IDs

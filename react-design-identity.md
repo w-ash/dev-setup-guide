@@ -166,9 +166,9 @@ paths:
   - "web/src/components/**"
   - "web/src/pages/**"
 ---
-# Web Design System — Dark Editorial Aesthetic
+# Web Design System — [Your Aesthetic Name]
 
-A power tool for metadata enthusiasts. Precise, data-rich, intentionally crafted.
+[Your one-line identity statement. e.g., "A focused tool for data professionals. Precise, dense, intentionally crafted."]
 
 ## Typography Hierarchy (enforce)
 - Display font (Space Grotesk): headings, buttons, nav labels

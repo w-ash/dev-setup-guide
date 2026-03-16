@@ -1,11 +1,9 @@
-# Python 3.14+ Tooling Setup
+# Python 3.14+ Tooling & Syntax
 
-> **Scope**: uv, Ruff, BasedPyright, pytest, and pre-commit hook configuration
+> **Scope**: uv, Ruff, BasedPyright, pytest, pre-commit hooks, and modern Python syntax patterns
 > **Prerequisites**: [Project Structure](project-structure.md)
 > **Deliverables**: `pyproject.toml` with all tool configs, `.pre-commit-config.yaml`, tools running cleanly
 > **Estimated effort**: S
-
-Modern Python syntax patterns (PEP 695, 604, 649, etc.) are covered separately in [Python 3.14+ Syntax](python-syntax.md).
 
 ---
 
@@ -59,6 +57,7 @@ select = [
     "TRY",   # Exception handling
     "PL",    # Pylint checks
     "PTH",   # Use pathlib
+    # "FAST",  # FastAPI-specific rules (add if using FastAPI)
 ]
 ignore = [
     "E501",    # Line too long — handled by formatter
@@ -104,6 +103,148 @@ docstring-code-line-length = "dynamic"
 - `TC001`/`TC002`/`TC003`/`TC006`: Python 3.14's PEP 649 (deferred evaluation of annotations) makes `TYPE_CHECKING` blocks unnecessary except for genuine circular imports
 - `preview = true`: enables the latest rules and formatter improvements
 - Test-specific ignores: `S101` (assert), `ARG001` (fixture args), `PLR2004` (magic test values)
+
+**Known issue**: Ruff has a convergence bug on `conftest.py` — `ruff format` works fine, but `ruff check --fix` may loop. If you see this, run check and format separately.
+
+---
+
+## Python 3.14+ Syntax Patterns
+
+Modern patterns enforced by the Ruff rules above. Each section shows the preferred syntax and the legacy alternative to avoid.
+
+### Generics (PEP 695)
+```python
+# DO — Python 3.14 syntax
+class Repository[TModel, TDomain]: ...
+
+
+async def execute[TResult](factory: Callable[..., TResult]) -> TResult: ...
+
+
+# DON'T — legacy
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+
+class Repository(Generic[T]): ...
+```
+
+### Union Types (PEP 604)
+```python
+# DO
+def find(id: int) -> User | None: ...
+def parse(value: str | int | float) -> str: ...
+
+
+# DON'T
+from typing import Optional, Union
+
+
+def find(id: int) -> Optional[User]: ...
+```
+
+### PEP 649 Deferred Annotations
+```python
+# DO — Python 3.14 evaluates annotations lazily by default
+def process(item: MyClass) -> MyClass: ...
+
+
+# DON'T
+from __future__ import annotations  # Unnecessary in 3.14
+
+
+def process(item: "MyClass") -> "MyClass":  # String quotes unnecessary
+    ...
+```
+
+For annotation introspection, use the new `annotationlib` module (replaces `typing.get_type_hints()` for advanced use cases).
+
+### Timestamps (PEP 615)
+```python
+# DO
+from datetime import UTC, datetime
+
+now = datetime.now(UTC)
+
+# DON'T
+now = datetime.utcnow()  # Returns naive datetime (deprecated)
+now = datetime.now()  # Returns local time (ambiguous)
+```
+
+### Structured Concurrency (PEP 654)
+```python
+# DO — TaskGroup cancels all on first failure
+async with asyncio.TaskGroup() as tg:
+    tg.create_task(fetch_users())
+    tg.create_task(fetch_orders())
+
+# DON'T — gather leaves partial results on failure
+results = await asyncio.gather(fetch_users(), fetch_orders())
+```
+
+### Multi-Exception Handling (PEP 758)
+```python
+# DO — Python 3.14, no parentheses needed
+except TimeoutError, ConnectionError:
+    handle_network_error()
+
+# Without PEP 758
+except (TimeoutError, ConnectionError):
+    handle_network_error()
+```
+
+**Caveat**: Adding `as e` requires parentheses: `except (TimeoutError, ConnectionError) as e:`.
+
+### Type Guards (PEP 742)
+```python
+# DO
+from typing import TypeIs
+
+
+def is_admin(user: User) -> TypeIs[AdminUser]:
+    return user.role == "admin"
+
+
+if is_admin(user):
+    user.admin_action()  # Type narrowed to AdminUser
+
+# DON'T
+if hasattr(user, "admin_action"):  # type: ignore
+    user.admin_action()
+```
+
+### Template Strings (PEP 750)
+```python
+# DO — t-strings return Template objects, not strings
+from string.templatelib import Template
+
+query = t"SELECT * FROM users WHERE name = {name}"
+# Returns a Template with .strings and .values — safe for SQL/HTML
+
+# DON'T — f-strings for untrusted interpolation
+query = f"SELECT * FROM users WHERE name = {name}"  # Injection risk
+```
+
+Template strings enable safe SQL, HTML, and structured logging interpolation by separating the template from its values.
+
+### `finally` Control Flow (PEP 765)
+```python
+# DON'T — Python 3.14 emits SyntaxWarning for these
+try:
+    do_work()
+finally:
+    return cleanup()     # SyntaxWarning: silently swallows exceptions
+    # Also: break/continue in finally blocks
+```
+
+### Deprecated Typing Patterns
+
+| Pattern | Status | Replacement |
+|---|---|---|
+| `AnyStr` | Deprecated (removal 3.18) | `[A: (str, bytes)]` constrained generics |
+| `TypeAlias` | Deprecated | `type X = ...` statement syntax |
+| `NamedTuple("NT", x=int)` | Deprecated (removal 3.15) | Class syntax: `class NT(NamedTuple): x: int` |
 
 ---
 
@@ -180,7 +321,7 @@ repos:
     -   id: debug-statements
     -   id: check-added-large-files
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.0
+    rev: v0.15.6
     hooks:
     -   id: ruff
         args: [--fix]

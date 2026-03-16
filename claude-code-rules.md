@@ -28,6 +28,10 @@ Rules are markdown files in `.claude/rules/` that give Claude persistent, scoped
 | `.claude/rules/` (no paths) | Universally needed but too detailed for CLAUDE.md (rare — prefer scoping) |
 | Auto memory | Claude discovers it itself: build quirks, debugging patterns, user prefs |
 
+### Where Rule Content Comes From
+
+Each guide in this project has an "Encoding in `.claude/rules/`" section showing exactly what to put in your rule files. The goal: capture the guide's patterns in your own config so Claude Code never needs to read the guide itself. The guide is your seed; your rules are what Claude actually uses.
+
 ### Recommended Rule Files
 
 Start with your **architecture boundaries** — each layer that has its own import rules gets its own file:
@@ -88,8 +92,9 @@ Large frontend rules should be split by concern — architecture rules load for 
 - TypeScript strict mode — no any, no @ts-ignore
 
 # web-design-system.md — paths: ["web/src/components/**", "web/src/pages/**"]
-- Dark mode is default — never assume light backgrounds
-- Display font (Space Grotesk), Body font (Newsreader), Mono font (JetBrains Mono)
+# Example — replace with your project's actual design tokens:
+- Dark mode is default — design dark-first, support light mode via user preference
+- Display font (Your Display Font), Body font (Your Body Font), Mono font (Your Mono Font)
 - No uniform containers — use 3-level depth system (inset/flat/elevated)
 ```
 
@@ -146,11 +151,15 @@ All available fields:
 | `model` | No | `sonnet`, `opus`, `haiku`, or `inherit` (default: inherit from parent) |
 | `color` | No | Status line color — hex string (e.g., `"#a855f7"`) |
 | `tools` | No | Tool allowlist, comma-separated. Omit to inherit all tools |
-| `disallowedTools` | No | Tool denylist (alternative to `tools`) |
+| `disallowedTools` | No | Tool denylist (alternative to `tools` — use one or the other) |
 | `maxTurns` | No | Upper bound on agent turns before stopping |
 | `skills` | No | Skills to preload into agent context, comma-separated |
 | `permissionMode` | No | `default`, `plan` (read-only), `acceptEdits`, `bypassPermissions` |
 | `memory` | No | Persistent cross-session memory: `user`, `project`, or `local` |
+| `mcpServers` | No | Scope specific MCP servers to this agent |
+| `hooks` | No | Lifecycle hooks defined in agent frontmatter |
+| `background` | No | Always run as a background task (`true`/`false`) |
+| `isolation` | No | `worktree` — run in an isolated git worktree copy of the repo |
 
 ### Key Fields Explained
 
@@ -198,7 +207,9 @@ Agent prompts are the markdown body after the frontmatter. Aim for 100-300 lines
 
 ## skills/ — Reference Documents
 
-Skills are markdown files in `.claude/skills/<name>/SKILL.md` that serve as embedded reference documents. They're the primary way to give agents (and the main conversation) domain knowledge.
+Skills follow the **Agent Skills open standard** and are the primary way to give agents (and the main conversation) domain knowledge. They live at `.claude/skills/<name>/SKILL.md`.
+
+**Note**: `.claude/commands/` is legacy. If both a command and a skill share a name, the skill takes precedence. Prefer `.claude/skills/` for new content.
 
 ### Two Types
 
@@ -223,6 +234,17 @@ description: Step-by-step guide for adding a new module to the project
 ## Step 1: Create domain entities...
 ## Step 2: Define repository protocol...
 ```
+
+### Advanced Skill Features
+
+Skills support several powerful features beyond static content:
+
+- **`context: fork`** — run the skill in an isolated subagent context
+- **`agent`** — specify which agent type processes the skill
+- **`$ARGUMENTS`** — substitution token replaced with user-provided args (e.g., `/skill-name my-args`)
+- **`` !`command` ``** — dynamic context injection: runs a shell command and inlines the output before the skill content is sent to Claude (e.g., `` !`gh pr diff` `` to include the current PR diff)
+- **`hooks`** — lifecycle hooks defined in skill frontmatter
+- **`allowed-tools`** / `model` — override tool access and model per-skill
 
 ### Skills + Agents Integration
 
