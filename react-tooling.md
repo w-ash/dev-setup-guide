@@ -25,6 +25,7 @@ export default defineConfig({
     tsconfigPaths: true,  // Reads paths from tsconfig.json — no manual alias needed
   },
   server: {
+    forwardConsole: true,  // Browser console errors appear in terminal
     open: true,
     proxy: {
       "/api": {
@@ -39,7 +40,28 @@ export default defineConfig({
 });
 ```
 
-Key features: Tailwind v4 plugin, `@/` alias via tsconfig paths (Vite 8 reads `tsconfig.json` natively), and `/api` proxy to FastAPI during development. Choose unique ports per project so multiple projects can run simultaneously — update both the Vite proxy target and the FastAPI CORS origin to match.
+Key features: Tailwind v4 plugin, `@/` alias via tsconfig paths (Vite 8 reads `tsconfig.json` natively), `/api` proxy to FastAPI during development, and `forwardConsole` to surface browser errors in the terminal (especially useful with coding agents). Choose unique ports per project so multiple projects can run simultaneously — update both the Vite proxy target and the FastAPI CORS origin to match.
+
+### Code Splitting
+
+Vite 8 replaces Rollup's `manualChunks` with Rolldown's `codeSplitting` groups. Use this to isolate heavy vendor libraries into separately-cacheable chunks:
+
+```typescript
+build: {
+  rolldownOptions: {
+    output: {
+      codeSplitting: {
+        groups: [
+          { name: "heavy-lib", test: /heavy-lib/, priority: 20 },
+          { name: "vendor", test: /node_modules/, priority: 10, minSize: 50_000 },
+        ],
+      },
+    },
+  },
+},
+```
+
+Higher `priority` claims modules first when multiple patterns match. Combine with dynamic `import()` for libraries only needed on interaction (e.g., graph layout engines) to defer their download entirely.
 
 ### Tailwind v4 Setup
 
