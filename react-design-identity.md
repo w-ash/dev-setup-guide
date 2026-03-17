@@ -1,7 +1,7 @@
 # Visual Identity & Anti-AI-Slop Design
 
 > **Scope**: How to develop a unique visual identity for your project and avoid AI-generated design patterns
-> **Prerequisites**: [React Tooling](react-tooling.md)
+> **Prerequisites**: [Product Context](product-context.md), [React Tooling](react-tooling.md)
 > **Deliverables**: Design identity answers documented, `.claude/rules/web-design-system.md` written with your project's specific aesthetic
 > **Estimated effort**: M
 
@@ -17,7 +17,9 @@ The fix: give AI tools a strong, specific identity to enforce. Ground every desi
 
 ## Step 1: Define Your Design Identity
 
-Answer three questions before touching CSS. These answers drive every visual decision:
+Answer three questions before touching CSS. These answers drive every visual decision.
+
+Your answers here should flow directly from your [Product Context](product-context.md). If you defined "power users who value density and control" as your primary persona, that eliminates generous whitespace and playful colors before you've opened a CSS file. The persona constrains the aesthetic — let it.
 
 **Who is your audience?**
 - Power users who value density and keyboard shortcuts? (Linear, Raycast)
@@ -73,6 +75,10 @@ Font choice should match the character of your system:
 ---
 
 ## Step 3: Avoid Universal Anti-Patterns
+
+### Define Your Anti-Aesthetic
+
+Before listing what to do, list what you WON'T do. Keep a running list of visual territories to avoid — a negative-space approach that forces original decisions. Example: "No glowing grids. No gradients that look like a sci-fi poster. No identical card layouts. No decorative blobs." This is more effective than positive principles alone because it eliminates the defaults AI tools reach for, forcing every remaining choice to be deliberate.
 
 **Visual clichés:**
 - **Default typeface (Inter)** — see Font Selection above

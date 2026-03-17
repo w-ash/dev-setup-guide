@@ -41,7 +41,9 @@ For most full-stack apps: **left sidebar**. It scales to 8+ pages and accommodat
 
 ### Personas & User Journeys
 
-Define 1-2 specific personas (not "tech-savvy professional" — instead: "checks the dashboard every Monday for 5 minutes"). Then map end-to-end flows as tables to reveal missing screens:
+Use the personas you defined in [Product Context](product-context.md). If you haven't defined them yet, go back and do that first — building pages without knowing who they're for produces generic interfaces.
+
+Map your personas' end-to-end flows as tables to reveal missing screens:
 
 ```markdown
 | Step | Screen | Action | Result |

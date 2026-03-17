@@ -173,6 +173,33 @@ Reference version numbers for cross-version deps, story titles for within-versio
 
 ---
 
+## Writing Stories from Personas
+
+Backlog stories should trace back to the personas and use cases you defined in [Product Context](product-context.md). This ensures every story serves a real user need, not just a technical capability.
+
+**User story format** (use alongside the story template above):
+
+> "As a [persona], I want [capability] so that [benefit]."
+
+**Example**: If your primary persona is "The Weekly Curator" — someone who manages 15+ playlists and updates them weekly:
+
+```markdown
+- [ ] **Filter tracks by recent play count**
+    - Effort: M
+    - What: As the Weekly Curator, I want to filter liked tracks by play count in the last 30 days so I can build a "current obsessions" playlist
+    - Why: Manual cross-referencing of play counts is the primary pain point
+    - Dependencies: v0.1.0 (track import), v0.1.1 (play history import)
+    - Status: Not Started
+    - Acceptance criteria:
+        - Filter returns only tracks with >= N plays in the last 30 days
+        - Results update when play history is re-imported
+        - Works with tracks from any connected service, not just one
+```
+
+The persona name in the story ("As the Weekly Curator") is a quick litmus test: if you can't name which persona wants this feature, question whether it belongs in the backlog. Features that don't serve a specific persona tend to be scope creep.
+
+---
+
 ## Epic Grouping
 
 Group related stories into epics for natural work batching:

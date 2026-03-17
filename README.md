@@ -24,13 +24,16 @@ This guide covers everything you need to go from zero to a production-ready Pyth
 
 ### Phase 1: Product & AI Setup (do this FIRST)
 
-- [ ] **[Product Context](product-context.md)** — Define the problem, users, success criteria, and scope `[XS]`
+Phase 1 is the foundation everything else builds on. Skip it or rush it and every later decision lacks grounding — you end up building technically excellent features nobody needs.
+
+- [ ] **[Product Context](product-context.md)** — Define the problem, users, personas, use cases, and scope `[S]`
 - [ ] **[Claude Code Setup](claude-code-setup.md)** — CLAUDE.md authorship, hooks, permissions `[M]`
 - [ ] **[Claude Code Rules](claude-code-rules.md)** — Path-scoped rules, specialist agents, reference skills `[M]`
 
 ### Phase 2: Planning Setup
 
 - [ ] **[Backlog Planning](backlog-planning.md)** — Version-based roadmap, epic/story format, effort estimation `[S]`
+- [ ] **[Spec Enforcement](spec-enforcement.md)** — Keep implementation grounded in user needs via self-checks, rules, and skills `[S]`
 
 ### Phase 3: Foundation
 
