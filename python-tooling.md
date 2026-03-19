@@ -18,7 +18,7 @@ fastapi, uvicorn[standard], httpx, loguru, pydantic, pydantic-settings, python-d
 
 **Dev dependencies**:
 ```
-pytest, pytest-asyncio, ruff, basedpyright, pre-commit
+pytest, pytest-asyncio, ruff, basedpyright, vulture, pre-commit
 ```
 
 ---
@@ -234,7 +234,7 @@ Template strings enable safe SQL, HTML, and structured logging interpolation by 
 try:
     do_work()
 finally:
-    return cleanup()     # SyntaxWarning: silently swallows exceptions
+    return cleanup()  # SyntaxWarning: silently swallows exceptions
     # Also: break/continue in finally blocks
 ```
 
@@ -277,6 +277,99 @@ reportMissingTypeArgument = "warning"  # Bare generics valid in 3.14
 reportUninitializedInstanceVariable = "none"  # Decorator-initialized fields
 enableTypeIgnoreComments = true
 ```
+
+---
+
+## Vulture (Dead Code Detection)
+
+Vulture finds unused Python code — functions, classes, variables, imports — via static analysis. In a single-maintainer codebase, dead code accumulates silently; Vulture catches it before it becomes load-bearing confusion.
+
+Add to dev dependencies: `uv add --group dev vulture`
+
+### Configuration
+
+```toml
+[tool.vulture]
+paths = ["src/", "vulture_whitelist.py"]
+exclude = ["tests/"]
+min_confidence = 60
+
+# Framework-registered handlers look "unused" because they're called at runtime, not by direct call sites
+ignore_decorators = [
+    "@router.*",           # FastAPI route handlers
+    "@app.command",        # Typer CLI commands
+    "@*_app.command",      # Typer CLI sub-app commands
+    "@app.callback",       # Typer CLI callbacks
+    "@app.exception_handler",  # FastAPI exception handlers
+    "@task",               # Prefect tasks
+    "@flow",               # Prefect flows
+    "@field_validator",    # Pydantic field validators
+    "@model_validator",    # Pydantic model validators
+    "@computed_field",     # Pydantic computed fields
+]
+
+# Framework conventions — names consumed by the framework, not by your code
+ignore_names = [
+    "model_config",        # Pydantic class-level config
+    "revision",            # Alembic migration variables
+    "down_revision",
+    "branch_labels",
+    "depends_on",
+    "upgrade",             # Alembic migration functions
+    "downgrade",
+]
+```
+
+Run with: `uv run vulture` (paths come from pyproject.toml, no CLI args needed).
+
+### Whitelist File
+
+For false positives that `ignore_decorators` and `ignore_names` can't cover, maintain a `vulture_whitelist.py` at the project root. Organize entries by category and comment every one:
+
+```python
+# vulture_whitelist.py — false positives from framework patterns.
+# Run: uv run vulture  (paths configured in pyproject.toml)
+
+# --- Pydantic model fields (serialization, not direct attribute access) ---
+severity           # Pydantic field on ValidationErrorSchema
+token_type         # Pydantic field on TokenResponse
+
+# --- attrs field declarations (used by framework, not direct reference) ---
+last_modified      # attrs field on CacheEntry
+progress_operation # attrs field on ImportResult
+
+# --- Enum members (completeness of the enum, used through iteration) ---
+STARTED            # ProgressStatus enum
+PULL               # SyncDirection enum
+
+# --- Protocol/interface methods (implementations called at runtime) ---
+get_metadata       # ConnectorProtocol — called by framework
+error_classifier   # BaseAPIConnector property — Protocol contract
+
+# --- FastAPI app-level registrations (not covered by @router.*) ---
+spa_catchall       # SPA catch-all route, registered via app.route
+ErrorResponse      # Referenced in FastAPI response_model declarations
+```
+
+**Key discipline**: Review every whitelist entry. We caught three genuinely dead items — an unused schema class, a wrapper function superseded by a lower-level call, and a public method that only tests exercised but no production code path ever called — hiding behind overly broad suppressions.
+
+### Confidence Levels
+
+`min_confidence = 60` is the practical threshold. Everything Vulture reports at 60% confidence is almost always a framework false positive (Pydantic fields, attrs fields, enum members). If you ever see something at **100% confidence**, it's almost certainly real dead code — investigate immediately.
+
+### Anti-pattern: Overly Broad Suppressions
+
+```python
+# DON'T — suppress entire names that might match real dead code later
+*_field             # Wildcards hide genuine unused code
+model_config        # This one is fine in ignore_names, but...
+some_real_function  # ...adding prod functions "just in case" defeats the tool
+
+# DO — be specific, comment the reason, organize by category
+severity  # Pydantic field on WorkflowValidationErrorSchema — serialized, never accessed directly
+```
+
+If a whitelist entry doesn't have a clear explanation of why the code is used at runtime, it probably shouldn't be whitelisted — it might be genuinely dead.
 
 ---
 

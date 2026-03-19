@@ -114,6 +114,7 @@ uv run pytest                           # All fast tests
 pnpm --prefix web test                  # All frontend tests
 uv run ruff check . --fix               # Lint + autofix
 uv run ruff format .                    # Format
+uv run vulture                          # Dead code check
 
 # -- Full Verification (version bump / on request) ---------
 uv run pytest -m ""                     # All tests (including slow)

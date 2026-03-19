@@ -327,13 +327,17 @@ sub_task = progress.add_task(f"  -> {sub_op.name}", total=sub_op.total_items)
 ### Date Parsing
 
 ```python
-def parse_date_string(date_str: str | None, field_name: str = "date") -> datetime | None:
+def parse_date_string(
+    date_str: str | None, field_name: str = "date"
+) -> datetime | None:
     if not date_str:
         return None
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=UTC)
     except ValueError:
-        get_err_console().print(f"[red]Invalid {field_name} format: {date_str}. Use YYYY-MM-DD.[/red]")
+        get_err_console().print(
+            f"[red]Invalid {field_name} format: {date_str}. Use YYYY-MM-DD.[/red]"
+        )
         raise typer.Exit(1) from None
 ```
 

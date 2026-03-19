@@ -75,6 +75,7 @@ Route handlers should be 5-10 lines. All business logic lives in use cases.
 # src/interface/api/schemas/items.py
 from pydantic import BaseModel
 
+
 class ItemResponse(BaseModel):
     id: int
     name: str
@@ -249,9 +250,7 @@ class ItemRepository:
             return {}
 
         stmt = (
-            select(DBItem)
-            .where(DBItem.id.in_(ids))
-            .options(selectinload(DBItem.tags))
+            select(DBItem).where(DBItem.id.in_(ids)).options(selectinload(DBItem.tags))
         )
         result = await self._session.execute(stmt)
         rows = result.scalars().all()
@@ -297,6 +296,7 @@ The Unit of Work manages the transaction boundary: **auto-commit on success, aut
 ```python
 # src/infrastructure/persistence/unit_of_work.py
 from typing import Self
+
 
 class DatabaseUnitOfWork:
     def __init__(self, session: AsyncSession) -> None:

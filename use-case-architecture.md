@@ -28,6 +28,7 @@ Every use case file contains exactly three `@define` classes:
 ```python
 # src/application/use_cases/create_order.py
 
+
 @define(frozen=True, slots=True)
 class CreateOrderCommand:
     """Immutable input — validated at construction, never modified."""
@@ -83,10 +84,10 @@ The use case owns the transaction — not the runner, not the route handler:
 
 ```python
 async def execute(self, command, uow):
-    async with uow:                    # Opens transaction
+    async with uow:  # Opens transaction
         repo = uow.get_order_repository()
         order = await repo.create(command.items)
-        await uow.commit()             # Explicit commit on success
+        await uow.commit()  # Explicit commit on success
         return CreateOrderResult(order=order, items_processed=len(command.items))
     # Exception escaping the block → auto-rollback, no try/catch needed
 ```
@@ -187,14 +188,20 @@ def non_empty_string(instance, attribute, value):
 def positive_int_in_range(min_val=1, max_val=10000):
     def validator(instance, attribute, value):
         if not isinstance(value, int) or not (min_val <= value <= max_val):
-            raise ValueError(f"{attribute.name} must be {min_val}–{max_val}, got {value}")
+            raise ValueError(
+                f"{attribute.name} must be {min_val}–{max_val}, got {value}"
+            )
+
     return validator
 
 
 def optional_in_choices(choices: list[str]):
     def validator(instance, attribute, value):
         if value is not None and value not in choices:
-            raise ValueError(f"{attribute.name} must be one of {choices}, got {value!r}")
+            raise ValueError(
+                f"{attribute.name} must be one of {choices}, got {value!r}"
+            )
+
     return validator
 ```
 

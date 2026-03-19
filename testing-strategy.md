@@ -161,7 +161,7 @@ async def db_session() -> AsyncGenerator[AsyncSession]:
     os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{db_file}"
 
     reset_engine_cache()  # Clear cached engine so a fresh one uses the new URL
-    await init_db()       # Run migrations to create schema
+    await init_db()  # Run migrations to create schema
 
     session = get_session_factory()()
     try:
