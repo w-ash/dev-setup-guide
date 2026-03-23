@@ -333,7 +333,9 @@ For how use cases consume UoW (transaction ownership, commit/rollback rules, rea
 
 ```python
 import functools
-from loguru import logger
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def db_operation(operation_name: str):

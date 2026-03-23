@@ -42,7 +42,7 @@ Phase 1 is the foundation everything else builds on. Skip it or rush it and ever
 ### Phase 4: Language & Tooling
 
 - [ ] **[Python Tooling](python-tooling.md)** — uv, Ruff, BasedPyright, pytest, pre-commit, Python 3.14+ syntax patterns `[S]`
-- [ ] **[Project Configuration](project-configuration.md)** — Typed settings, organized constants, structured logging `[S]`
+- [ ] **[Project Configuration](project-configuration.md)** — Typed settings, organized constants, structured logging with structlog `[S]`
 
 ### Phase 5: Stack (pick what applies)
 

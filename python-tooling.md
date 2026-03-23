@@ -13,7 +13,7 @@ Initialize with `uv init`, then configure `pyproject.toml`:
 
 **Core dependencies** (adjust to your project):
 ```
-fastapi, uvicorn[standard], httpx, loguru, pydantic, pydantic-settings, python-dotenv
+fastapi, uvicorn[standard], httpx, structlog, pydantic, pydantic-settings, python-dotenv
 ```
 
 **Dev dependencies**:
@@ -67,7 +67,7 @@ ignore = [
     "TC003",   # Move to TYPE_CHECKING — obsolete with PEP 649
     "TC006",   # Cast quotes — contradicts PEP 649
     "TRY003",  # Long exception messages — clear errors are good
-    "TRY400",  # Use logging.exception — doesn't apply to loguru
+    "TRY400",  # Use logging.exception — structlog uses exc_info= instead
 ]
 fixable = ["ALL"]
 

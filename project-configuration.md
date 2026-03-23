@@ -1,6 +1,6 @@
 # Project Configuration
 
-> **Scope**: Typed settings with Pydantic, constants organized by domain, structured logging with loguru
+> **Scope**: Typed settings with Pydantic, constants organized by domain, structured logging with structlog
 > **Prerequisites**: [Python Tooling](python-tooling.md)
 > **Deliverables**: Settings module with typed fields, constants module, logging configuration
 > **Estimated effort**: S
@@ -141,102 +141,169 @@ class Defaults:
 
 ---
 
-## Structured Logging with Loguru
+## Structured Logging with structlog
 
-Configure logging once at startup. Separate **console** (human-readable, colorized) from **file** (structured JSON, machine-parseable) output.
+### Why structlog in 2026
+
+structlog (v25.5+) is the recommended structured logging library for Python. Three reasons:
+
+1. **Flat JSON by default** — `JSONRenderer()` produces `{"level": "info", "event": "msg"}`. AI agents, jq, and log aggregators (Loki, Datadog) parse top-level keys directly. No `.record.level.name` traversal.
+2. **Stdlib integration mode** — structlog wraps Python's `logging` module, so Prefect, Uvicorn, FastAPI, and any third-party library using stdlib loggers flow through the same processor pipeline automatically. Zero bridge code.
+3. **Composable processor pipeline** — one chain of functions handles timestamping, context merging, callsite info, and rendering. Swap `ConsoleRenderer` for `JSONRenderer` per handler — same processors, different output.
+
+### Configuration
+
+Configure logging once at startup. Use **stdlib integration mode** so all Python loggers (Prefect, Uvicorn, etc.) flow through structlog's processor pipeline automatically.
 
 ```python
 # src/config/logging.py
+import logging
+import logging.handlers
 import sys
-from loguru import logger
 from pathlib import Path
 
+import structlog
 
-def setup_logging(*, verbose: bool = False, log_dir: str = "logs") -> None:
-    """Configure logging with console + JSON file output."""
-    log_path = Path(log_dir)
-    log_path.mkdir(exist_ok=True)
 
+def setup_logging(*, verbose: bool = False) -> None:
+    """Configure structlog with dual output: pretty console + flat JSON file."""
     console_level = "DEBUG" if verbose else "INFO"
 
-    logger.configure(
-        handlers=[
-            # Console: colorized, real-time debugging
-            {
-                "sink": sys.stdout,
-                "level": console_level,
-                "format": (
-                    "<green>{time:HH:mm:ss.SSS}</green> | "
-                    "<level>{level: <8}</level> | "
-                    "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
-                    "<level>{message}</level>"
-                ),
-                "colorize": True,
-            },
-            # File: structured JSON, rotated, compressed
-            {
-                "sink": str(log_path / "app.log"),
-                "level": "DEBUG",
-                "serialize": True,  # JSON output for log aggregation
-                "rotation": "10 MB",  # Size-based rotation
-                "retention": "1 week",  # Auto-delete old logs
-                "compression": "zip",  # Compress rotated files
-                "enqueue": True,  # Async writes (don't block app)
-                "catch": True,  # Don't crash app on logging errors
-            },
-        ],
-        # Default context fields — appear in every log entry
-        extra={"service": "my-app", "module": "root"},
+    # Shared processor chain — runs for ALL output (console + file + third-party)
+    shared_processors = [
+        structlog.contextvars.merge_contextvars,  # async-safe context propagation
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.ExtraAdder(),             # stdlib extra → structlog event dict
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.CallsiteParameterAdder([
+            structlog.processors.CallsiteParameter.FUNC_NAME,
+            structlog.processors.CallsiteParameter.LINENO,
+        ]),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.UnicodeDecoder(),
+    ]
+
+    # Configure structlog to wrap stdlib logging
+    structlog.configure(
+        processors=[*shared_processors, structlog.stdlib.ProcessorFormatter.wrap_for_formatter],
+        wrapper_class=structlog.stdlib.BoundLogger,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
     )
+
+    # Console handler — colorized for humans
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(getattr(logging, console_level))
+    console_handler.setFormatter(structlog.stdlib.ProcessorFormatter(
+        foreign_pre_chain=shared_processors,  # process third-party stdlib logs too
+        processors=[
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.dev.ConsoleRenderer(colors=True),
+        ],
+    ))
+
+    # File handler — flat JSON for agents, jq, log aggregation
+    file_handler = logging.handlers.RotatingFileHandler("logs/app.log", maxBytes=10_485_760, backupCount=7)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(structlog.stdlib.ProcessorFormatter(
+        foreign_pre_chain=shared_processors,
+        processors=[
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.processors.dict_tracebacks,  # structured exception dicts
+            structlog.processors.JSONRenderer(),
+        ],
+    ))
+
+    # Attach to root logger — ALL Python loggers flow through this
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(console_handler)
+    root.addHandler(file_handler)
+    root.setLevel(logging.DEBUG)
+```
+
+The JSON output is flat — every field is a top-level key:
+
+```json
+{
+  "timestamp": "2026-03-22T10:00:00.000000Z",
+  "level": "info",
+  "event": "Processing item",
+  "logger": "app.services.importer",
+  "func_name": "process_item",
+  "lineno": 42,
+  "service": "my-app",
+  "item_id": 123
+}
 ```
 
 ### Module-Level Logger Binding
 
 ```python
 # In any module:
-from loguru import logger
+import structlog
 
-log = logger.bind(module=__name__)
+logger = structlog.get_logger(__name__, service="my-app")
 
 
 async def process_item(item_id: int) -> None:
-    log.info("Processing item", item_id=item_id)
-    # JSON output: {"message": "Processing item", "extra": {"module": "app.services", "item_id": 42}}
+    logger.info("Processing item", item_id=item_id)
+    # Flat JSON: {"event": "Processing item", "item_id": 123, "logger": "app.services", ...}
+```
+
+Or use a factory that pre-binds common context:
+
+```python
+# src/config/logging.py
+def get_logger(name: str) -> structlog.stdlib.BoundLogger:
+    return structlog.get_logger(name, service="my-app", module=name)
 ```
 
 ### Context Binding for Operations
 
+**Per-logger binding** (permanent for that logger instance):
+
 ```python
 async def import_data(source: str, user_id: str) -> None:
-    # Bind context once — all subsequent log calls include it
     op_log = logger.bind(operation="import", source=source, user_id=user_id)
     op_log.info("Import started")
 
     for batch in batches:
         op_log.debug("Processing batch", batch_size=len(batch))
-        # Every log entry now carries operation, source, user_id
 
     op_log.info("Import completed", total=total_count)
 ```
 
-**Why `enqueue=True`**: Without this, file writes block the event loop in async applications. `enqueue=True` sends log entries to a background thread, keeping your async code responsive.
-
-**Why `serialize=True`**: JSON logs can be ingested by log aggregation tools (Grafana Loki, ELK, CloudWatch). Structured fields (`item_id`, `operation`) become searchable dimensions instead of buried in free-text messages.
-
-### Security: Disable Backtrace in Production
+**Async-safe context propagation** (via contextvars — propagates across `await` boundaries):
 
 ```python
-# Production handler — no backtrace or diagnose (prevents info leakage)
-{
-    "sink": str(log_path / "app.log"),
-    "backtrace": False,  # Don't show local variables in tracebacks
-    "diagnose": False,  # Don't show variable values in exception frames
-}
+from contextlib import contextmanager
+from structlog.contextvars import bind_contextvars, unbind_contextvars
 
-# Development handler — full diagnostics
-{
-    "sink": sys.stdout,
-    "backtrace": True,  # Show local variables
-    "diagnose": True,  # Show variable values (sensitive data risk!)
-}
+@contextmanager
+def logging_context(**kwargs):
+    bind_contextvars(**kwargs)
+    try:
+        yield
+    finally:
+        unbind_contextvars(*kwargs.keys())
+
+# Usage — all logs inside this block carry workflow_id, even across await boundaries
+with logging_context(workflow_id=42, run_id="abc123"):
+    logger.info("Starting workflow")          # includes workflow_id, run_id
+    await some_async_operation()              # logs inside also include them
+    logging.getLogger("prefect").info("Task done")  # stdlib logs too!
+```
+
+### Exception Logging
+
+structlog uses stdlib's `exc_info` parameter — no special API needed:
+
+```python
+try:
+    await risky_operation()
+except Exception:
+    logger.error("Operation failed", exc_info=True, operation="sync")
+    # dict_tracebacks processor renders structured exception dicts in JSON output
 ```

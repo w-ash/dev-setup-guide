@@ -200,9 +200,9 @@ Create httpx clients through factories that attach structured logging hooks. Eve
 ```python
 # src/infrastructure/connectors/_shared/http_client.py
 import httpx
-from loguru import logger
+import structlog
 
-_http_logger = logger.bind(module="http_client")
+_http_logger = structlog.get_logger("http_client")
 
 
 async def _log_request(request: httpx.Request) -> None:
