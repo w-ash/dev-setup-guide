@@ -40,7 +40,7 @@ export default defineConfig({
 });
 ```
 
-Key features: Tailwind v4 plugin, `@/` alias via tsconfig paths (Vite 8 reads `tsconfig.json` natively), `/api` proxy to FastAPI during development, and `forwardConsole` to surface browser errors in the terminal (especially useful with coding agents). Choose unique ports per project so multiple projects can run simultaneously — update both the Vite proxy target and the FastAPI CORS origin to match.
+Key features: Tailwind v4 plugin, `#/` alias via Node.js subpath imports (`package.json` `"imports"` field), `/api` proxy to FastAPI during development, and `forwardConsole` to surface browser errors in the terminal (especially useful with coding agents). Choose unique ports per project so multiple projects can run simultaneously — update both the Vite proxy target and the FastAPI CORS origin to match.
 
 ### Code Splitting
 
@@ -98,8 +98,7 @@ Tailwind v4 uses automatic content detection — no `tailwind.config.js` needed.
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": { "#/*": ["./src/*"] }
   },
   "include": ["src"]
 }

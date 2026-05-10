@@ -148,7 +148,7 @@ export default mergeConfig(
 );
 ```
 
-Merges the Vite config (aliases, plugins) so tests resolve `@/` imports identically to the app.
+Merges the Vite config (aliases, plugins) so tests resolve `#/` imports identically to the app.
 
 ---
 
@@ -164,8 +164,8 @@ import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll } from "vitest";
 
 // Import auto-generated MSW handlers from Orval
-import { getHealthMock } from "@/api/generated/health/health.msw";
-import { getItemsMock } from "@/api/generated/items/items.msw";
+import { getHealthMock } from "#/api/generated/health/health.msw";
+import { getItemsMock } from "#/api/generated/items/items.msw";
 
 export const server = setupServer(
   ...getHealthMock(),
@@ -183,7 +183,7 @@ Override the auto-generated happy-path handlers per-test to test error scenarios
 
 ```typescript
 import { http, HttpResponse } from "msw";
-import { server } from "@/test/setup";
+import { server } from "#/test/setup";
 
 test("shows error message on API failure", async () => {
   server.use(
