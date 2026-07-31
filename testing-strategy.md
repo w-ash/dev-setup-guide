@@ -27,7 +27,7 @@
 | `src/domain/` | `tests/unit/domain/` | unit | No mocks needed |
 | `src/application/use_cases/` | `tests/unit/application/use_cases/` | unit | Mock UoW + repos |
 | `src/infrastructure/persistence/` | `tests/integration/repositories/` | integration | Real DB session |
-| `src/interface/api/` | `tests/integration/api/` | integration | httpx AsyncClient |
+| `src/interface/api/` | `tests/integration/api/` | integration | httpx2 AsyncClient |
 
 ---
 

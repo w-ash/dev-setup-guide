@@ -33,7 +33,7 @@ Most external APIs communicate via HTTP. The base classifier maps status codes t
 
 ```python
 from abc import ABC, abstractmethod
-import httpx
+import httpx2
 
 
 class HTTPErrorClassifier(ABC):
@@ -45,7 +45,7 @@ class HTTPErrorClassifier(ABC):
             return result
 
         # 2. HTTP status code mapping
-        if isinstance(exception, httpx.HTTPStatusError):
+        if isinstance(exception, httpx2.HTTPStatusError):
             status = exception.response.status_code
             match status:
                 case 404:
@@ -58,7 +58,7 @@ class HTTPErrorClassifier(ABC):
                     return ("temporary", str(s), "Server error")
 
         # 3. Network errors are always temporary
-        if isinstance(exception, httpx.RequestError):
+        if isinstance(exception, httpx2.RequestError):
             return ("temporary", "network", str(exception))
 
         # 4. Unknown — let retry logic decide
@@ -86,7 +86,7 @@ class StripeErrorClassifier(HTTPErrorClassifier):
         exception: Exception,
     ) -> tuple[str, str, str] | None:
         if (
-            isinstance(exception, httpx.HTTPStatusError)
+            isinstance(exception, httpx2.HTTPStatusError)
             and exception.response.status_code == 401
             and "expired" in exception.response.text.lower()
         ):
@@ -195,21 +195,21 @@ async for attempt in RetryPolicyFactory.create(config):
 
 ## HTTP Client Factories with Event Hooks
 
-Create httpx clients through factories that attach structured logging hooks. Every request and response is logged automatically — no per-call logging code needed.
+Create httpx2 clients through factories that attach structured logging hooks. Every request and response is logged automatically — no per-call logging code needed.
 
 ```python
 # src/infrastructure/connectors/_shared/http_client.py
-import httpx
+import httpx2
 import structlog
 
 _http_logger = structlog.get_logger("http_client")
 
 
-async def _log_request(request: httpx.Request) -> None:
+async def _log_request(request: httpx2.Request) -> None:
     _http_logger.debug("HTTP request", method=request.method, url=str(request.url))
 
 
-async def _log_response(response: httpx.Response) -> None:
+async def _log_response(response: httpx2.Response) -> None:
     await response.aread()  # Buffer body + populate elapsed time
     if response.status_code < 400:
         _http_logger.debug(
@@ -235,19 +235,19 @@ _EVENT_HOOKS: dict[str, list] = {
 ### Service-Specific Client Factories
 
 ```python
-def make_stripe_client(api_key: str) -> httpx.AsyncClient:
-    return httpx.AsyncClient(
+def make_stripe_client(api_key: str) -> httpx2.AsyncClient:
+    return httpx2.AsyncClient(
         base_url="https://api.stripe.com/v1",
         headers={"Authorization": f"Bearer {api_key}"},
-        timeout=httpx.Timeout(connect=5.0, read=30.0, write=10.0, pool=5.0),
+        timeout=httpx2.Timeout(connect=5.0, read=30.0, write=10.0, pool=5.0),
         event_hooks=_EVENT_HOOKS,  # Shared hooks — all traffic logged
     )
 
 
-def make_weather_client() -> httpx.AsyncClient:
-    return httpx.AsyncClient(
+def make_weather_client() -> httpx2.AsyncClient:
+    return httpx2.AsyncClient(
         base_url="https://api.weather.gov",
-        timeout=httpx.Timeout(connect=5.0, read=15.0, write=5.0, pool=5.0),
+        timeout=httpx2.Timeout(connect=5.0, read=15.0, write=5.0, pool=5.0),
         event_hooks=_EVENT_HOOKS,
     )
 ```

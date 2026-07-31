@@ -13,7 +13,7 @@ Initialize with `uv init`, then configure `pyproject.toml`:
 
 **Core dependencies** (adjust to your project):
 ```
-fastapi, uvicorn[standard], httpx, structlog, pydantic, pydantic-settings, python-dotenv
+fastapi, uvicorn[standard], httpx2, structlog, pydantic, pydantic-settings, python-dotenv
 ```
 
 **Dev dependencies**:
